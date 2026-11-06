@@ -120,10 +120,10 @@
 
       <!-- أزرار الصوت والأجواء وحالة الاتصال السحابي -->
       <div class="flex items-center gap-2 text-xs">
-        <!-- زر تشغيل الموسيقى الهادئة المدمجة -->
-        <button id="bgm-toggle-btn" onclick="toggleBackgroundMusic()" title="موسيقى محيطية للتركيز" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition flex items-center gap-1.5">
-          <i id="bgm-icon" class="fa-solid fa-music"></i>
-          <span class="hidden sm:inline text-[11px]" id="bgm-status-text">تشغيل الموسيقى</span>
+        <!-- زر تشغيل الموسيقى الشرقية المدمجة -->
+        <button id="bgm-toggle-btn" onclick="toggleOrientalMusic()" title="تقاسيم موسيقية شرقية / قانون هادئ" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition flex items-center gap-1.5">
+          <i id="bgm-icon" class="fa-solid fa-guitar"></i>
+          <span class="hidden sm:inline text-[11px]" id="bgm-status-text">تشغيل نغمات شرقية (قانون)</span>
         </button>
 
         <!-- كتم / تفعيل المؤثرات الصوتية للأزرار -->
@@ -163,20 +163,13 @@
             <label class="block text-xs font-semibold text-slate-300 mb-2">أدخل الرمز السري (Code):</label>
             <div class="relative">
               <input 
-                type="password" 
+                type="text" 
                 id="login-passcode" 
                 placeholder="أدخل الرمز هنا..." 
-                class="w-full text-center text-xl font-bold tracking-widest bg-slate-950 border border-slate-700/80 rounded-2xl px-4 py-3.5 text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition"
+                class="w-full text-center text-xl font-bold tracking-widest bg-slate-950 border border-slate-700/80 rounded-2xl px-4 py-3.5 text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition uppercase"
                 required
                 autocomplete="off"
               >
-              <button 
-                type="button" 
-                onclick="togglePasswordVisibility('login-passcode', 'login-eye-icon')" 
-                class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-500 hover:text-slate-300"
-              >
-                <i id="login-eye-icon" class="fa-solid fa-eye text-sm"></i>
-              </button>
             </div>
             <p id="login-alert-text" class="text-xs text-rose-400 mt-2 text-center hidden"></p>
           </div>
@@ -440,8 +433,9 @@
             
             <div class="w-full flex items-center justify-between mb-3 text-xs">
               <div class="flex items-center gap-2">
-                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 pulse-live" id="stream-status-dot"></span>
+                <span class="w-2.5 h-2.5 rounded-full bg-slate-500" id="stream-status-dot"></span>
                 <span class="font-bold text-slate-200">بث شاشة الهاتف المباشر (Full Phone View)</span>
+                <span id="active-client-online-badge" class="px-2 py-0.5 rounded text-[10px] bg-slate-800 text-slate-400 border border-slate-700">غير متصل</span>
               </div>
               <div class="flex items-center gap-2">
                 <button onclick="toggleVideoZoom()" class="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300" title="ملء الإطار">
@@ -592,9 +586,16 @@
             <div class="flex items-center justify-between border-b border-slate-800 pb-2">
               <h4 class="font-bold text-xs text-slate-200 flex items-center gap-2">
                 <i class="fa-solid fa-sliders text-amber-400"></i>
-                إدارة كود ومعلومات الزبون النشط
+                إدارة الجلسة والتحكم بالزبون
               </h4>
-              <button onclick="editCurrentClientDetails()" class="text-xs text-indigo-400 hover:underline">تعديل البيانات</button>
+              <div class="flex items-center gap-2">
+                <button onclick="clearActiveClientChat()" class="text-xs text-rose-400 hover:underline flex items-center gap-1" title="مسح رسائل المحادثة فقط">
+                  <i class="fa-solid fa-broom"></i>
+                  <span>مسح الشات</span>
+                </button>
+                <span class="text-slate-600">|</span>
+                <button onclick="editCurrentClientDetails()" class="text-xs text-indigo-400 hover:underline">تعديل البيانات</button>
+              </div>
             </div>
             
             <div class="grid grid-cols-2 gap-2 text-xs">
@@ -608,12 +609,20 @@
               </div>
             </div>
 
-            <div class="flex items-center gap-2 pt-1 text-xs">
-              <button onclick="copyClientWhatsAppLink()" class="flex-1 bg-emerald-700 hover:bg-emerald-600 text-white font-bold py-2 rounded-xl transition flex items-center justify-center gap-1.5">
+            <div class="flex items-center gap-2 pt-1 text-xs flex-wrap">
+              <button onclick="copyClientWhatsAppLink()" class="flex-1 bg-emerald-700 hover:bg-emerald-600 text-white font-bold py-2 rounded-xl transition flex items-center justify-center gap-1.5 min-w-[170px]">
                 <i class="fa-brands fa-whatsapp text-sm"></i>
-                <span>نسخ رسالة الواتساب للزبون</span>
+                <span>نسخ رابط واتساب السحري</span>
               </button>
-              <button onclick="deleteActiveClient()" class="bg-rose-950 hover:bg-rose-900 text-rose-300 px-3 py-2 rounded-xl border border-rose-800 transition" title="حذف الجلسة">
+              
+              <!-- زر إنهاء الجلسة وطرد الزبون عن بعد -->
+              <button onclick="terminateActiveClientSession()" class="bg-amber-950 hover:bg-amber-900 text-amber-300 px-3 py-2 rounded-xl border border-amber-800 transition flex items-center gap-1" title="طرد الزبون وإغلاق الجلسة عليه">
+                <i class="fa-solid fa-user-slash"></i>
+                <span>إنهاء الجلسة</span>
+              </button>
+
+              <!-- زر حذف الزبون وسجله بالكامل -->
+              <button onclick="deleteActiveClient()" class="bg-rose-950 hover:bg-rose-900 text-rose-300 px-3 py-2 rounded-xl border border-rose-800 transition" title="حذف الزبون نهائياً">
                 <i class="fa-regular fa-trash-can"></i>
               </button>
             </div>
@@ -732,10 +741,8 @@
     const STORAGE_KEY_CLIENTS = 'electro_clients_list';
     const STORAGE_KEY_CHATS = 'electro_chats_db';
 
-    // مفتاح الأدمين الافتراضي (يمكن للمشرف تغييره في أي وقت من لوحته)
     let currentAdminSecret = localStorage.getItem(STORAGE_KEY_ADMIN_PASS) || '1234';
 
-    // قائمة الزبائن النشطين في ذاكرة الأدمين
     let clientsList = [];
     try {
       clientsList = JSON.parse(localStorage.getItem(STORAGE_KEY_CLIENTS)) || [];
@@ -743,7 +750,6 @@
       clientsList = [];
     }
 
-    // قاعدة بيانات المحادثات (مقسمة حسب كود الجلسة)
     let chatsDb = {};
     try {
       chatsDb = JSON.parse(localStorage.getItem(STORAGE_KEY_CHATS)) || {};
@@ -759,28 +765,25 @@
       localStorage.setItem(STORAGE_KEY_CHATS, JSON.stringify(chatsDb));
     }
 
-    // حالة التطبيق الحالية
-    let userRole = null; // 'admin' | 'client' | null
-    let activeClientSession = null; // كائن الزبون الحالي
-    let activeAdminSelectedCode = null; // الكود المحدد حالياً في لوحة تحكم الأدمين
+    let userRole = null; 
+    let activeClientSession = null; 
+    let activeAdminSelectedCode = null; 
+    let clientStatusMap = {}; // { [code]: boolean (true=online, false=offline) }
 
     /* ==================== 2. الاتصال المشفر P2P السحابي (PeerJS) ==================== */
     let myPeer = null;
     let peerIdPrefix = "electro-nor-2026-";
-    let activeDataConnections = {}; // كود الجلسة => PeerJS DataConnection
-    let activeMediaCalls = {}; // كود الجلسة => MediaConnection
+    let activeDataConnections = {}; 
+    let activeMediaCalls = {}; 
 
-    // مسارات البث الصوتي والمرئي
     let localScreenStream = null;
     let localCameraStream = null;
 
-    // مسجل الصوت للرسائل الصوتية
     let mediaRecorder = null;
     let audioChunks = [];
     let recTimerInterval = null;
     let recSeconds = 0;
 
-    // تهيئة PeerJS عند فتح الصفحة
     function initPeerEngine(desiredId, onReady) {
       updateP2PStatus("جاري الربط بالسيرفر المشفر...", "amber");
       
@@ -789,7 +792,6 @@
           myPeer.destroy();
         }
 
-        // إنشاء عميل PeerJS يستخدم السيرفر السحابي المجاني المشفر
         myPeer = new Peer(desiredId, {
           debug: 1,
           config: {
@@ -805,12 +807,10 @@
           if (onReady) onReady(id);
         });
 
-        // استقبال اتصالات البيانات (للشات والصوت والصور)
         myPeer.on('connection', (conn) => {
           setupIncomingDataConnection(conn);
         });
 
-        // استقبال مكالمات الفيديو أو بث الشاشة
         myPeer.on('call', (call) => {
           setupIncomingMediaCall(call);
         });
@@ -837,11 +837,13 @@
       }
     }
 
-    // معالجة قنوات البيانات الواردة
     function setupIncomingDataConnection(conn) {
       conn.on('open', () => {
-        playBeep(600, 0.1);
-        activeDataConnections[conn.peer] = conn;
+        const clientCode = conn.metadata?.clientCode;
+        if (clientCode && userRole === 'admin') {
+          activeDataConnections[clientCode] = conn;
+          setClientOnlineStatus(clientCode, true);
+        }
       });
 
       conn.on('data', (data) => {
@@ -849,13 +851,72 @@
       });
 
       conn.on('close', () => {
-        delete activeDataConnections[conn.peer];
+        const clientCode = conn.metadata?.clientCode;
+        if (clientCode && userRole === 'admin') {
+          delete activeDataConnections[clientCode];
+          setClientOnlineStatus(clientCode, false);
+        }
       });
     }
 
-    // استقبال رسائل الشات والوسائط لحظياً
+    // رصد حالة اتصال وخروج الزبون لحظياً
+    function setClientOnlineStatus(code, isOnline) {
+      clientStatusMap[code] = isOnline;
+      if (isOnline) {
+        playClientJoinedTone();
+      } else {
+        playClientLeftTone();
+      }
+      renderAdminTabs();
+      updateActiveClientStatusUI();
+    }
+
+    function updateActiveClientStatusUI() {
+      if (userRole !== 'admin') return;
+      const isOnline = !!clientStatusMap[activeAdminSelectedCode];
+      const badge = document.getElementById('active-client-online-badge');
+      const dot = document.getElementById('stream-status-dot');
+
+      if (badge) {
+        if (isOnline) {
+          badge.textContent = "متصل الآن (Online)";
+          badge.className = "px-2 py-0.5 rounded text-[10px] bg-emerald-950 text-emerald-400 border border-emerald-800";
+        } else {
+          badge.textContent = "الزبون غير متصل أو غادر";
+          badge.className = "px-2 py-0.5 rounded text-[10px] bg-rose-950 text-rose-400 border border-rose-800";
+        }
+      }
+
+      if (dot) {
+        dot.className = `w-2.5 h-2.5 rounded-full ${isOnline ? 'bg-emerald-400 pulse-live' : 'bg-rose-500'}`;
+      }
+    }
+
     function handleIncomingP2PMessage(payload, conn) {
-      playBeep(880, 0.12); // صوت وصول رسالة جديدة
+      if (payload.type === 'session-terminate') {
+        // تم إنهاء الجلسة من قبل الأدمن عن بعد
+        alert("قام المشرف بإنهاء هذه الجلسة وإغلاقها. شكراً لتواصلك.");
+        logoutApp();
+        return;
+      }
+
+      if (payload.type === 'client-online-ping') {
+        if (userRole === 'admin') {
+          setClientOnlineStatus(payload.sessionCode, true);
+        }
+        return;
+      }
+
+      if (payload.type === 'chat-clear') {
+        if (chatsDb[payload.sessionCode]) {
+          chatsDb[payload.sessionCode] = [];
+          saveChatsToStorage();
+          renderChatBoxes();
+        }
+        return;
+      }
+
+      playMessageTone();
       
       const { type, sessionCode, message } = payload;
       if (!chatsDb[sessionCode]) chatsDb[sessionCode] = [];
@@ -866,19 +927,13 @@
       renderChatBoxes();
     }
 
-    // معالجة المكالمات الواردة (فيديو أو شاشة)
     function setupIncomingMediaCall(call) {
-      // الرد على المكالمة بتدفق محلي إن وجد، أو فارغ للمشاهدة فقط
       const streamToSend = localCameraStream || localScreenStream || createEmptyStream();
       call.answer(streamToSend);
 
       call.on('stream', (remoteStream) => {
         playBeep(520, 0.15);
-        
-        // التحقق إن كانت المكالمة بث شاشة أو كاميرا
-        const hasVideo = remoteStream.getVideoTracks().length > 0;
         if (userRole === 'admin') {
-          // إن كانت من الزبون، نعرضها في إطار الهاتف
           const phoneVideo = document.getElementById('admin-phone-stream-video');
           const placeholder = document.getElementById('admin-stream-placeholder');
           if (phoneVideo) {
@@ -887,7 +942,6 @@
             if (placeholder) placeholder.classList.add('hidden');
           }
 
-          // وإذا كانت مكالمة فيديو
           const callVideo = document.getElementById('admin-remote-client-video');
           const callPlaceholder = document.getElementById('admin-call-placeholder');
           if (callVideo) {
@@ -896,7 +950,6 @@
             if (callPlaceholder) callPlaceholder.classList.add('hidden');
           }
         } else {
-          // للزبون: عرض كاميرا الأدمين
           const clientVideo = document.getElementById('client-remote-call-video');
           const clientPlaceholder = document.getElementById('client-call-placeholder');
           if (clientVideo) {
@@ -915,7 +968,7 @@
       return canvas.captureStream();
     }
 
-    /* ==================== 3. نظام تسجيل الدخول الموحد ==================== */
+    /* ==================== 3. نظام تسجيل الدخول الموحد والمُصلح ==================== */
     function handleUniversalLogin(e) {
       if (e) e.preventDefault();
       const passInput = document.getElementById('login-passcode');
@@ -929,42 +982,46 @@
         return;
       }
 
-      // 1. هل المدخل هو رمز الأدمين المشرف؟
+      // 1. هل المدخل هو رمز المشرف (الأدمن)؟
       if (val === currentAdminSecret) {
         userRole = 'admin';
         initAdminView();
         return;
       }
 
-      // 2. هل المدخل هو رمز جلسة زبون متاح؟
-      const foundClient = clientsList.find(c => c.code === val);
-      if (foundClient) {
-        userRole = 'client';
-        activeClientSession = foundClient;
-        initClientView(foundClient);
-        return;
+      // 2. هل هو كود زبون مخزن محلياً؟
+      let foundClient = clientsList.find(c => c.code.toLowerCase() === val.toLowerCase());
+      
+      // 3. إذا لم يوجد محلياً (لأن الزبون في جهاز منفصل)، نتحقق من بيانات الرابط أو ننشئ جلسة الزبون تلقائياً بهذا الكود
+      if (!foundClient) {
+        const urlClientData = parseSessionFromURL();
+        if (urlClientData && urlClientData.code.toLowerCase() === val.toLowerCase()) {
+          foundClient = urlClientData;
+        } else {
+          // إنشاء جلسة زبون بالكود المدخل فوراً دون رفض
+          foundClient = {
+            id: Date.now().toString(),
+            name: "زبون محترم",
+            device: "هاتف ذكي",
+            phone: "",
+            code: val.toUpperCase(),
+            created: new Date().toLocaleDateString('ar-MA')
+          };
+        }
+        clientsList.push(foundClient);
+        saveClientsToStorage();
       }
 
-      showLoginAlert("الرمز المدخل غير مسجل أو انتهت صلاحيته! تواصل مع المشرف.");
+      userRole = 'client';
+      activeClientSession = foundClient;
+      initClientView(foundClient);
     }
 
     function showLoginAlert(msg) {
       const alertEl = document.getElementById('login-alert-text');
       alertEl.textContent = msg;
       alertEl.classList.remove('hidden');
-      playBeep(220, 0.2); // صوت تنبيه للخطأ
-    }
-
-    function togglePasswordVisibility(inputId, iconId) {
-      const input = document.getElementById(inputId);
-      const icon = document.getElementById(iconId);
-      if (input.type === 'password') {
-        input.type = 'text';
-        icon.className = 'fa-solid fa-eye-slash text-sm';
-      } else {
-        input.type = 'password';
-        icon.className = 'fa-solid fa-eye text-sm';
-      }
+      playBeep(220, 0.2);
     }
 
     function logoutApp() {
@@ -972,6 +1029,11 @@
       stopClientScreenShare();
       stopAllMediaTracks();
       
+      if (userRole === 'client' && activeClientSession && myPeer) {
+        // إبلاغ المشرف بالخروج قبل الإغلاق
+        notifyAdminClientLeft(activeClientSession.code);
+      }
+
       userRole = null;
       activeClientSession = null;
       document.getElementById('login-passcode').value = '';
@@ -992,7 +1054,7 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    /* ==================== 4. تفعيل واجهة الزبون (Client Setup) ==================== */
+    /* ==================== 4. تفعيل واجهة الزبون ==================== */
     function initClientView(client) {
       document.getElementById('client-view-name').textContent = client.name || 'زبون معتمد';
       document.getElementById('client-view-phone').textContent = client.device || 'هاتف غير محدد';
@@ -1001,11 +1063,14 @@
       switchPage('view-client');
       renderChatBoxes();
 
-      // تهيئة المعرف الخاص بالزبون P2P
       const clientPeerId = `${peerIdPrefix}client-${client.code}`;
-      initPeerEngine(clientPeerId, (id) => {
-        // محاولة الاتصال التلقائي بالأدمين
+      initPeerEngine(clientPeerId, () => {
         connectToPeerAdmin(client.code);
+      });
+
+      // إشعار خروج تلقائي عند إغلاق التبويب أو المتصفح
+      window.addEventListener('beforeunload', () => {
+        notifyAdminClientLeft(client.code);
       });
     }
 
@@ -1019,6 +1084,11 @@
 
       conn.on('open', () => {
         activeDataConnections[adminPeerId] = conn;
+        // إرسال إشعار حضور
+        conn.send({
+          type: 'client-online-ping',
+          sessionCode: clientCode
+        });
       });
 
       conn.on('data', (data) => {
@@ -1026,17 +1096,25 @@
       });
     }
 
-    /* ==================== 5. تفعيل لوحة تحكم الأدمين (Admin Setup) ==================== */
+    function notifyAdminClientLeft(clientCode) {
+      const adminPeerId = `${peerIdPrefix}admin`;
+      const conn = activeDataConnections[adminPeerId];
+      if (conn && conn.open) {
+        try {
+          conn.close();
+        } catch(e) {}
+      }
+    }
+
+    /* ==================== 5. تفعيل لوحة تحكم الأدمين ==================== */
     function initAdminView() {
       switchPage('view-admin');
 
-      // تهيئة معرف الأدمين الموحد
       const adminPeerId = `${peerIdPrefix}admin`;
       initPeerEngine(adminPeerId, () => {
         // جاهز للاستقبال
       });
 
-      // إذا لم يكن هناك زبائن، ننشئ زبوناً تجريبياً تلقائياً
       if (clientsList.length === 0) {
         const sampleClient = {
           id: Date.now().toString(),
@@ -1056,16 +1134,17 @@
 
       renderAdminTabs();
       renderActiveClientDetails();
+      updateActiveClientStatusUI();
       renderChatBoxes();
     }
 
-    // عرض تابات الزبائن المتعددين للأدمين
     function renderAdminTabs() {
       const container = document.getElementById('admin-clients-tabs-container');
       if (!container) return;
 
       container.innerHTML = clientsList.map(c => {
         const isSelected = c.code === activeAdminSelectedCode;
+        const isOnline = !!clientStatusMap[c.code];
         return `
           <button 
             onclick="selectAdminClient('${c.code}')" 
@@ -1075,7 +1154,7 @@
                 : 'bg-slate-950 text-slate-300 border-slate-800 hover:border-slate-700'
             }"
           >
-            <span class="w-2 h-2 rounded-full ${isSelected ? 'bg-emerald-400 pulse-live' : 'bg-slate-500'}"></span>
+            <span class="w-2.5 h-2.5 rounded-full ${isOnline ? 'bg-emerald-400 pulse-live' : 'bg-slate-600'}"></span>
             <span>${c.name}</span>
             <span class="font-mono text-[10px] px-1.5 py-0.5 rounded bg-black/40 text-amber-300">${c.code}</span>
           </button>
@@ -1088,6 +1167,7 @@
       activeAdminSelectedCode = code;
       renderAdminTabs();
       renderActiveClientDetails();
+      updateActiveClientStatusUI();
       renderChatBoxes();
     }
 
@@ -1102,7 +1182,109 @@
       document.getElementById('card-active-phone').textContent = client.phone || 'غير مسجل';
     }
 
-    /* ==================== 6. إدارة الزبائن وتغيير الأكواد ==================== */
+    /* ==================== 6. إدارة الزبائن، مسح الشات وطرد الجلسات ==================== */
+    function clearActiveClientChat() {
+      if (!activeAdminSelectedCode) return;
+      if (!confirm("هل أنت متأكد من مسح جميع رسائل المحادثة لهذا الزبون؟")) return;
+
+      chatsDb[activeAdminSelectedCode] = [];
+      saveChatsToStorage();
+      renderChatBoxes();
+
+      // إبلاغ الزبون بالمسح
+      const conn = activeDataConnections[activeAdminSelectedCode];
+      if (conn && conn.open) {
+        conn.send({
+          type: 'chat-clear',
+          sessionCode: activeAdminSelectedCode
+        });
+      }
+      playBeep(700, 0.08);
+    }
+
+    function terminateActiveClientSession() {
+      if (!activeAdminSelectedCode) return;
+      if (!confirm("هل تريد إغلاق الجلسة فوراً وإخراج الزبون من الموقع عن بُعد؟")) return;
+
+      const conn = activeDataConnections[activeAdminSelectedCode];
+      if (conn && conn.open) {
+        conn.send({
+          type: 'session-terminate',
+          sessionCode: activeAdminSelectedCode
+        });
+        setTimeout(() => conn.close(), 200);
+      }
+
+      setClientOnlineStatus(activeAdminSelectedCode, false);
+      alert("تم إرسال أمر إنهاء الجلسة وإخراج الزبون.");
+    }
+
+    function deleteActiveClient() {
+      if (!confirm("هل أنت متأكد من رغبتك في حذف هذا الزبون وسجله بالكامل؟")) return;
+
+      // إنهاء الجلسة أولاً إذا كان متصلاً
+      const conn = activeDataConnections[activeAdminSelectedCode];
+      if (conn && conn.open) {
+        try {
+          conn.send({ type: 'session-terminate', sessionCode: activeAdminSelectedCode });
+          conn.close();
+        } catch(e) {}
+      }
+
+      const idx = clientsList.findIndex(c => c.code === activeAdminSelectedCode);
+      if (idx !== -1) {
+        delete chatsDb[activeAdminSelectedCode];
+        delete clientStatusMap[activeAdminSelectedCode];
+        delete activeDataConnections[activeAdminSelectedCode];
+        saveChatsToStorage();
+
+        clientsList.splice(idx, 1);
+        saveClientsToStorage();
+
+        activeAdminSelectedCode = clientsList.length > 0 ? clientsList[0].code : null;
+        renderAdminTabs();
+        renderActiveClientDetails();
+        updateActiveClientStatusUI();
+        renderChatBoxes();
+      }
+    }
+
+    // توليد رابط مشفر كامل يحمل بيانات الزبون لفتحه فوراً
+    function copyClientWhatsAppLink() {
+      const client = clientsList.find(c => c.code === activeAdminSelectedCode);
+      if (!client) return;
+
+      const baseUrl = window.location.origin + window.location.pathname;
+      const encodedPayload = btoa(unescape(encodeURIComponent(JSON.stringify(client))));
+      const clientMagicUrl = `${baseUrl}#session=${encodedPayload}`;
+
+      const text = `مرحباً ${client.name}، معك الدعم الفني لإلكترو نورالدين. تفضل بالضغط على هذا الرابط المباشر لبدء الجلسة فوراً دون الحاجة لكتابة كود:\n${clientMagicUrl}\n\n(أو كود دخولك اليدوي هو: ${client.code})`;
+
+      const tempInput = document.createElement("textarea");
+      tempInput.value = text;
+      document.body.appendChild(tempInput);
+      tempInput.select();
+      document.execCommand('copy');
+      document.body.removeChild(tempInput);
+
+      playBeep(650, 0.1);
+      alert("تم نسخ رابط الواتساب السحري بنجاح! بمجرد ضغط الزبون عليه ستفتح صفحته فوراً.");
+    }
+
+    function parseSessionFromURL() {
+      try {
+        const hash = window.location.hash;
+        if (hash.startsWith('#session=')) {
+          const raw = hash.replace('#session=', '');
+          const decoded = decodeURIComponent(escape(atob(raw)));
+          return JSON.parse(decoded);
+        }
+      } catch(e) {
+        console.warn("Could not parse session from hash:", e);
+      }
+      return null;
+    }
+
     function openNewClientModal() {
       playBeep(440, 0.05);
       generateRandomCodeForModal();
@@ -1125,14 +1307,13 @@
       const name = document.getElementById('modal-c-name').value.trim() || 'زبون جديد';
       const device = document.getElementById('modal-c-device').value.trim() || 'هاتف ذكي';
       const phone = document.getElementById('modal-c-phone').value.trim();
-      const code = document.getElementById('modal-c-code').value.trim();
+      const code = document.getElementById('modal-c-code').value.trim().toUpperCase();
 
       if (!code) {
         alert('يرجى تحديد كود الجلسة');
         return;
       }
 
-      // إضافة الزبون
       const newClient = {
         id: Date.now().toString(),
         name,
@@ -1148,6 +1329,7 @@
       activeAdminSelectedCode = code;
       renderAdminTabs();
       renderActiveClientDetails();
+      updateActiveClientStatusUI();
       closeNewClientModal();
       playBeep(700, 0.1);
     }
@@ -1162,15 +1344,14 @@
       const newDevice = prompt("تعديل نوع الهاتف:", client.device);
       if (newDevice !== null) client.device = newDevice.trim();
 
-      const newCode = prompt("تعديل كود الجلسة (6 أرقام):", client.code);
+      const newCode = prompt("تعديل كود الجلسة:", client.code);
       if (newCode !== null && newCode.trim() !== "") {
-        // نقل الشات إلى الكود الجديد
         if (chatsDb[client.code]) {
-          chatsDb[newCode.trim()] = chatsDb[client.code];
+          chatsDb[newCode.trim().toUpperCase()] = chatsDb[client.code];
           delete chatsDb[client.code];
           saveChatsToStorage();
         }
-        client.code = newCode.trim();
+        client.code = newCode.trim().toUpperCase();
         activeAdminSelectedCode = client.code;
       }
 
@@ -1178,41 +1359,6 @@
       renderAdminTabs();
       renderActiveClientDetails();
       renderChatBoxes();
-    }
-
-    function deleteActiveClient() {
-      if (!confirm("هل أنت متأكد من رغبتك في حذف هذا الزبون وسجل محادثاته؟")) return;
-
-      const idx = clientsList.findIndex(c => c.code === activeAdminSelectedCode);
-      if (idx !== -1) {
-        delete chatsDb[activeAdminSelectedCode];
-        saveChatsToStorage();
-        clientsList.splice(idx, 1);
-        saveClientsToStorage();
-
-        activeAdminSelectedCode = clientsList.length > 0 ? clientsList[0].code : null;
-        renderAdminTabs();
-        renderActiveClientDetails();
-        renderChatBoxes();
-      }
-    }
-
-    function copyClientWhatsAppLink() {
-      const client = clientsList.find(c => c.code === activeAdminSelectedCode);
-      if (!client) return;
-
-      const siteUrl = window.location.href;
-      const text = `مرحباً ${client.name}، معك الدعم الفني لإلكترو نورالدين. تفضل بالدخول إلى الرابط التالي وأدخل رمزك الخاص (${client.code}) لمتابعة شاشة هاتفك وحل المشكلة:\n${siteUrl}`;
-
-      const tempInput = document.createElement("textarea");
-      tempInput.value = text;
-      document.body.appendChild(tempInput);
-      tempInput.select();
-      document.execCommand('copy');
-      document.body.removeChild(tempInput);
-
-      playBeep(650, 0.1);
-      alert("تم نسخ نص الدعوة ورابط الموقع بنجاح! يمكنك الآن إرساله للزبون عبر واتساب.");
     }
 
     /* ==================== 7. أمان الأدمين ==================== */
@@ -1238,11 +1384,11 @@
       alert("تم تحديث رمز دخول المشرف بنجاح! احفظه جيداً.");
     }
 
-    /* ==================== 8. مشاركة الشاشة (Screen Sharing WebRTC) ==================== */
+    /* ==================== 8. مشاركة الشاشة ومكالمات الفيديو ==================== */
     async function startClientScreenShare() {
       try {
         if (!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia) {
-          alert("متصفح الهاتف الحالي لا يدعم مشاركة الشاشة المباشرة من المتصفح. استخدم متصفح Chrome أو افتح AnyDesk.");
+          alert("متصفح الهاتف الحالي لا يدعم مشاركة الشاشة المباشرة من المتصفح.");
           return;
         }
 
@@ -1251,7 +1397,6 @@
           audio: false
         });
 
-        // إظهار المعاينة لدى الزبون
         const preview = document.getElementById('client-preview-video');
         const box = document.getElementById('client-preview-box');
         preview.srcObject = localScreenStream;
@@ -1262,7 +1407,6 @@
         document.getElementById('client-screen-badge').textContent = "بث مباشر نشط";
         document.getElementById('client-screen-badge').className = "text-[10px] px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-800";
 
-        // إرسال البث للأدمن عبر PeerJS
         if (myPeer && activeClientSession) {
           const adminPeerId = `${peerIdPrefix}admin`;
           myPeer.call(adminPeerId, localScreenStream);
@@ -1302,7 +1446,6 @@
       }
     }
 
-    // محاكاة شاشة هاتف للأدمن للتجربة بدون هاتف ثانٍ
     function simulatePhoneCanvas() {
       const canvas = document.createElement('canvas');
       canvas.width = 720;
@@ -1315,7 +1458,6 @@
         ctx.fillStyle = "#090d16";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // شريط الهاتف العلوي
         ctx.fillStyle = "#1e293b";
         ctx.fillRect(0, 0, canvas.width, 70);
         ctx.fillStyle = "#94a3b8";
@@ -1325,13 +1467,11 @@
         ctx.textAlign = "left";
         ctx.fillText("📶 4G  🔋 92%", 40, 48);
 
-        // عنوان الواجهة
         ctx.textAlign = "center";
         ctx.fillStyle = "#6366f1";
         ctx.font = "bold 42px Tajawal, sans-serif";
         ctx.fillText("الإعدادات (Paramètres)", canvas.width / 2, 180);
 
-        // خيارات النظام
         const options = ["الواي فاي والشبكات", "إدارة التطبيقات والذاكرة", "العناية بالبطارية والتخزين", "حساب Google و iCloud", "تحديث البرامج والنظام"];
         options.forEach((opt, i) => {
           const y = 260 + i * 130;
@@ -1346,7 +1486,6 @@
           ctx.fillText(opt, canvas.width - 80, y + 62);
         });
 
-        // مؤشر توجيه نابض
         const targetY = 260 + 1 * 130 + 50;
         ctx.beginPath();
         ctx.arc(100 + Math.sin(step * 0.1) * 15, targetY, 20, 0, Math.PI * 2);
@@ -1385,7 +1524,6 @@
       }
     }
 
-    /* ==================== 9. مكالمة الفيديو المباشرة (Video / Audio Call) ==================== */
     async function toggleClientCall() {
       if (localCameraStream) {
         stopAllMediaTracks();
@@ -1407,7 +1545,6 @@
         document.getElementById('client-call-status-badge').textContent = "متصل لايف";
         document.getElementById('client-call-status-badge').className = "text-[10px] px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-800";
 
-        // إرسال المكالمة للأدمن
         if (myPeer) {
           const adminPeerId = `${peerIdPrefix}admin`;
           myPeer.call(adminPeerId, localCameraStream);
@@ -1437,7 +1574,6 @@
 
         document.getElementById('admin-call-btn-text').textContent = "إنهاء المكالمة";
 
-        // الاتصال بالزبون النشط
         if (myPeer && activeAdminSelectedCode) {
           const clientPeerId = `${peerIdPrefix}client-${activeAdminSelectedCode}`;
           myPeer.call(clientPeerId, localCameraStream);
@@ -1456,7 +1592,7 @@
       }
     }
 
-    /* ==================== 10. المحادثة المتطورة (نصية + صوتية + صور) ==================== */
+    /* ==================== 9. الشات والوسائط ==================== */
     function getCurrentSessionCode() {
       if (userRole === 'admin') return activeAdminSelectedCode;
       if (userRole === 'client' && activeClientSession) return activeClientSession.code;
@@ -1499,7 +1635,6 @@
       commitAndBroadcastMessage(code, messageObj);
     }
 
-    // إرسال صورة
     function handleImageAttach(event, senderRole) {
       const file = event.target.files[0];
       if (!file) return;
@@ -1524,7 +1659,6 @@
       event.target.value = '';
     }
 
-    // تسجيل الرسائل الصوتية
     async function startVoiceNote(senderRole) {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -1596,42 +1730,44 @@
       document.getElementById(barId).classList.add('hidden');
     }
 
-    // حفظ الرسالة وإرسالها عبر قناة P2P
     function commitAndBroadcastMessage(code, messageObj) {
       if (!chatsDb[code]) chatsDb[code] = [];
       chatsDb[code].push(messageObj);
       saveChatsToStorage();
 
       renderChatBoxes();
-      playBeep(620, 0.08);
+      playMessageTone();
 
-      // بث عبر PeerJS إلى الطرف الآخر
       const payload = {
         type: 'chat',
         sessionCode: code,
         message: messageObj
       };
 
-      Object.values(activeDataConnections).forEach(conn => {
+      if (userRole === 'client') {
+        const adminPeerId = `${peerIdPrefix}admin`;
+        const conn = activeDataConnections[adminPeerId];
         if (conn && conn.open) {
           try { conn.send(payload); } catch(e) {}
         }
-      });
+      } else {
+        const conn = activeDataConnections[code];
+        if (conn && conn.open) {
+          try { conn.send(payload); } catch(e) {}
+        }
+      }
     }
 
-    // بناء وتحديث صناديق المحادثة
     function renderChatBoxes() {
       const code = getCurrentSessionCode();
       const messages = (code && chatsDb[code]) ? chatsDb[code] : [];
 
-      // شات الأدمين
       const adminScroll = document.getElementById('admin-chat-scroll');
       if (adminScroll && userRole === 'admin') {
         adminScroll.innerHTML = messages.map(m => createMessageHTML(m, 'admin')).join('');
         adminScroll.scrollTop = adminScroll.scrollHeight;
       }
 
-      // شات الزبون
       const clientScroll = document.getElementById('client-chat-scroll');
       if (clientScroll && userRole === 'client') {
         clientScroll.innerHTML = messages.map(m => createMessageHTML(m, 'client')).join('');
@@ -1686,13 +1822,11 @@
       document.getElementById('modal-image-preview').classList.add('hidden');
     }
 
-    /* ==================== 11. مؤثرات صوتية وموسيقى الخلفية (Web Audio API) ==================== */
+    /* ==================== 10. نغمات وموسيقى شرقية أصيلة (تقاسيم القانون والعود) ==================== */
     let audioCtx = null;
     let sfxEnabled = true;
-    let bgmOscillator = null;
-    let bgmGain = null;
     let bgmPlaying = false;
-    let bgmInterval = null;
+    let orientalMelodyInterval = null;
 
     function getAudioContext() {
       if (!audioCtx) {
@@ -1702,6 +1836,104 @@
         audioCtx.resume();
       }
       return audioCtx;
+    }
+
+    // محاكاة نقرة وتر القانون أو العود الشرقي بنغمات متناسقة
+    function playQanunPluck(freq, delay = 0, duration = 1.4) {
+      if (!sfxEnabled && !bgmPlaying) return;
+      const ctx = getAudioContext();
+      const startTime = ctx.currentTime + delay;
+
+      const osc = ctx.createOscillator();
+      const oscHarmonic = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      // موجة مثلثة دافئة لمحاكاة آلة وترية
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(freq, startTime);
+
+      oscHarmonic.type = 'sine';
+      oscHarmonic.frequency.setValueAtTime(freq * 2, startTime);
+
+      gain.gain.setValueAtTime(0.0001, startTime);
+      gain.gain.linearRampToValueAtTime(0.06, startTime + 0.02); // هجوم النقرة (Pluck)
+      gain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration); // ارتداد طبيعي
+
+      osc.connect(gain);
+      oscHarmonic.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start(startTime);
+      oscHarmonic.start(startTime);
+      osc.stop(startTime + duration);
+      oscHarmonic.stop(startTime + duration);
+    }
+
+    // مقطوعة تقاسيم شرقية شعبية هادئة (مقام بياتي / نهاوند شرقي)
+    function toggleOrientalMusic() {
+      const ctx = getAudioContext();
+      const statusText = document.getElementById('bgm-status-text');
+      const icon = document.getElementById('bgm-icon');
+
+      if (bgmPlaying) {
+        bgmPlaying = false;
+        clearInterval(orientalMelodyInterval);
+        statusText.textContent = "تشغيل نغمات شرقية (قانون)";
+        icon.className = "fa-solid fa-guitar";
+      } else {
+        bgmPlaying = true;
+        statusText.textContent = "إيقاف الموسيقى الشرقية";
+        icon.className = "fa-solid fa-pause text-amber-400";
+
+        // نوتات مقام نهاوند الشرقي الدافئ
+        const orientalPhrases = [
+          [293.66, 329.63, 349.23, 392.00, 440.00, 392.00, 349.23, 329.63], // D E F G A G F E
+          [293.66, 349.23, 440.00, 523.25, 493.88, 440.00, 392.00, 349.23], // تقاسيم تصاعدية
+          [392.00, 440.00, 523.25, 587.33, 523.25, 440.00, 349.23, 293.66], // جوابات ونزول
+          [220.00, 293.66, 349.23, 440.00, 392.00, 329.63, 293.66]           // قرار دافئ
+        ];
+
+        let phraseIdx = 0;
+
+        function playPhrase() {
+          if (!bgmPlaying) return;
+          const phrase = orientalPhrases[phraseIdx];
+          phraseIdx = (phraseIdx + 1) % orientalPhrases.length;
+
+          phrase.forEach((note, i) => {
+            // عزف النغمات بنقرات قانون متسلسلة وتوزيع زمني واقعي
+            playQanunPluck(note, i * 0.38, 1.2);
+            if (i % 2 === 0) {
+              // وتر قرار مرافق (Bass note)
+              playQanunPluck(note / 2, i * 0.38, 1.6);
+            }
+          });
+        }
+
+        playPhrase();
+        orientalMelodyInterval = setInterval(playPhrase, 3800);
+      }
+    }
+
+    // نغمة دخول الزبون (إشعار ترحيبي أخضر)
+    function playClientJoinedTone() {
+      if (!sfxEnabled) return;
+      playQanunPluck(392, 0, 0.4);
+      playQanunPluck(523.25, 0.15, 0.8);
+      playQanunPluck(659.25, 0.3, 1.0);
+    }
+
+    // نغمة خروج الزبون أو انقطاعه (تنبيه أحمر)
+    function playClientLeftTone() {
+      if (!sfxEnabled) return;
+      playBeep(350, 0.15);
+      setTimeout(() => playBeep(250, 0.3), 150);
+    }
+
+    function playMessageTone() {
+      if (!sfxEnabled) return;
+      playQanunPluck(587.33, 0, 0.35);
+      playQanunPluck(880, 0.08, 0.5);
     }
 
     function playBeep(freq = 440, duration = 0.1) {
@@ -1736,65 +1968,17 @@
       }
     }
 
-    // موسيقى هادئة محيطية مدمجة بالكامل عبر مذبذبات Synthesizer
-    function toggleBackgroundMusic() {
-      const ctx = getAudioContext();
-      const statusText = document.getElementById('bgm-status-text');
-      const icon = document.getElementById('bgm-icon');
-
-      if (bgmPlaying) {
-        bgmPlaying = false;
-        clearInterval(bgmInterval);
-        if (bgmGain) {
-          bgmGain.gain.exponentialRampToValueAtTime(0.00001, ctx.currentTime + 0.5);
-        }
-        statusText.textContent = "تشغيل الموسيقى";
-        icon.className = "fa-solid fa-music";
-      } else {
-        bgmPlaying = true;
-        statusText.textContent = "إيقاف الموسيقى";
-        icon.className = "fa-solid fa-pause text-indigo-400";
-
-        // نغمات هادئة دورية (Am, F, C, G)
-        const chords = [
-          [220, 261.63, 329.63], // Am
-          [174.61, 220, 261.63], // F
-          [261.63, 329.63, 392], // C
-          [196, 246.94, 293.66]  // G
-        ];
-
-        let chordIndex = 0;
-        function playNextPad() {
-          if (!bgmPlaying) return;
-          const currentChord = chords[chordIndex];
-          chordIndex = (chordIndex + 1) % chords.length;
-
-          currentChord.forEach(f => {
-            const osc = ctx.createOscillator();
-            const g = ctx.createGain();
-            osc.type = 'triangle';
-            osc.frequency.value = f;
-
-            g.gain.setValueAtTime(0.001, ctx.currentTime);
-            g.gain.linearRampToValueAtTime(0.015, ctx.currentTime + 1.2);
-            g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 3.8);
-
-            osc.connect(g);
-            g.connect(ctx.destination);
-
-            osc.start();
-            osc.stop(ctx.currentTime + 4.0);
-          });
-        }
-
-        playNextPad();
-        bgmInterval = setInterval(playNextPad, 3600);
-      }
-    }
-
-    // التهيئة الابتدائية عند تحميل المستند
+    /* ==================== 11. الفحص التلقائي عند فتح الرابط ==================== */
     window.onload = function() {
-      // التحقق من وجود كود جلسة في رابط الموقع (مثال: ?code=889900) للتسهيل على الزبائن
+      // 1. هل الرابط يحمل بيانات جلسة سحرية (#session=...)؟
+      const sessionData = parseSessionFromURL();
+      if (sessionData && sessionData.code) {
+        document.getElementById('login-passcode').value = sessionData.code;
+        handleUniversalLogin();
+        return;
+      }
+
+      // 2. هل الرابط يحمل كود صريح (?code=...)؟
       const urlParams = new URLSearchParams(window.location.search);
       const urlCode = urlParams.get('code');
       if (urlCode) {
