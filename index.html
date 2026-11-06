@@ -1,2182 +1,644 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>إلكترو نورالدين | منصة الدعم الفني والإرشاد عن بُعد</title>
-  
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  
-  <!-- خط تجوال و كايرو -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
-  
-  <!-- FontAwesome Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-
-  <!-- PeerJS مكتبة الاتصال المباشر P2P السحابي -->
-  <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
-
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          fontFamily: {
-            tajawal: ['Tajawal', 'sans-serif'],
-          },
-          colors: {
-            theme: {
-              dark: '#070a13',
-              card: '#0d1322',
-              border: '#1f293d',
-              accent: '#8b5cf6',
-              emerald: '#10b981',
-              cyan: '#06b6d4',
-              coral: '#f43f5e'
-            }
-          }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إلكترو نورالدين - الدعم الفني المباشر</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- PeerJS for WebRTC -->
+    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap');
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: #0b0f19;
+            color: #f1f5f9;
         }
-      }
-    }
-  </script>
-
-  <style>
-    * {
-      font-family: 'Tajawal', sans-serif;
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    body {
-      background-color: #070a13;
-      background-image: 
-        radial-gradient(at 0% 0%, rgba(139, 92, 246, 0.12) 0px, transparent 50%),
-        radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.08) 0px, transparent 50%),
-        radial-gradient(at 50% 50%, rgba(6, 182, 212, 0.05) 0px, transparent 70%);
-      color: #e2e8f0;
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
-
-    /* مظهر إطار هاتف واقعي ومرتفع بنسبة 9:19.5 لعرض شاشة الهاتف كاملة */
-    .phone-mockup-frame {
-      aspect-ratio: 9 / 19.5;
-      max-height: 84vh;
-      border: 8px solid #1a2234;
-      border-radius: 42px;
-      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.9), 0 0 35px rgba(139, 92, 246, 0.25);
-      position: relative;
-      background: #020617;
-    }
-
-    .phone-notch {
-      position: absolute;
-      top: 6px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 100px;
-      height: 18px;
-      background: #1a2234;
-      border-radius: 0 0 14px 14px;
-      z-index: 20;
-    }
-
-    /* حركات وتأثيرات الرنين */
-    @keyframes ringing-pulse {
-      0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
-      50% { transform: scale(1.08); box-shadow: 0 0 0 20px rgba(16, 185, 129, 0); }
-      100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
-    }
-    .animate-ringing {
-      animation: ringing-pulse 1.3s infinite ease-in-out;
-    }
-
-    @keyframes live-pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.4; transform: scale(1.25); }
-    }
-    .pulse-dot {
-      animation: live-pulse 1.6s infinite ease-in-out;
-    }
-
-    ::-webkit-scrollbar {
-      width: 5px;
-      height: 5px;
-    }
-    ::-webkit-scrollbar-track {
-      background: rgba(13, 19, 34, 0.6);
-    }
-    ::-webkit-scrollbar-thumb {
-      background: #2a3754;
-      border-radius: 9999px;
-    }
-  </style>
+        .phone-frame {
+            aspect-ratio: 9 / 19.5;
+            max-height: 85vh;
+            border: 10px solid #1e293b;
+            border-radius: 38px;
+            box-shadow: 0 0 25px rgba(0, 0, 0, 0.8), inset 0 0 10px rgba(0,0,0,0.5);
+            background: #020617;
+            overflow: hidden;
+            position: relative;
+        }
+    </style>
 </head>
-<body class="flex flex-col justify-between selection:bg-purple-600 selection:text-white">
+<body class="min-h-screen flex flex-col justify-between selection:bg-cyan-500 selection:text-white">
 
-  <!-- ==================== 1. الشريط العلوي (الهيدر الذكي) ==================== -->
-  <header class="bg-[#0b101e]/90 backdrop-blur-xl border-b border-[#1b253b] sticky top-0 z-40 px-3 md:px-6 py-2.5">
-    <div class="max-w-7xl mx-auto flex items-center justify-between gap-2">
-      
-      <!-- شعار المنصة وتفاصيل الهوية -->
-      <div class="flex items-center gap-2.5">
-        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-violet-600 via-indigo-600 to-cyan-500 flex items-center justify-center text-white shadow-lg shadow-violet-600/30 text-lg font-black">
-          <i class="fa-solid fa-headset"></i>
-        </div>
-        <div>
-          <div class="flex items-center gap-2">
-            <h1 class="font-extrabold text-sm md:text-base tracking-wide text-white">إلكترو نورالدين</h1>
-            <span class="text-[10px] bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded-full font-bold">P2P v4.0</span>
-          </div>
-          <p class="text-[11px] text-slate-400">المنصة الشاملة لإصلاح وتوجيه الهواتف عن بُعد</p>
-        </div>
-      </div>
-
-      <!-- أدوات الصوت والموسيقى وحالة الاتصال -->
-      <div class="flex items-center gap-2">
-        
-        <!-- مشغل المقطوعات الصوتية المتطورة (إسلامية، غربية، شرقية) -->
-        <div class="flex items-center bg-[#131b2e] border border-[#22304d] rounded-2xl p-1 gap-1">
-          <select id="music-genre-select" onchange="changeMusicGenre()" class="bg-transparent text-[11px] text-slate-300 px-2 py-1 outline-none cursor-pointer border-none font-medium">
-            <option value="islamic" class="bg-[#0d1322] text-white">🎵 مقطوعة روحانية إسلامية (صامتة)</option>
-            <option value="western" class="bg-[#0d1322] text-white">🎹 ألحان غربية هادئة (Lo-Fi Chill)</option>
-            <option value="oriental" class="bg-[#0d1322] text-white">🪕 تقاسيم قانون وعود شرقية</option>
-          </select>
-
-          <button id="music-toggle-btn" onclick="toggleBackgroundMusic()" class="px-2.5 py-1 rounded-xl bg-violet-600/20 hover:bg-violet-600 text-violet-300 hover:text-white transition text-xs flex items-center gap-1.5 font-bold" title="تشغيل / إيقاف المقطوعة الموسيقية">
-            <i id="music-btn-icon" class="fa-solid fa-play text-[10px]"></i>
-            <span id="music-btn-text" class="hidden sm:inline text-[11px]">تشغيل</span>
-          </button>
-        </div>
-
-        <!-- تفعيل/كتم مؤثرات الأزرار -->
-        <button id="sfx-toggle-btn" onclick="toggleSfx()" title="المؤثرات الصوتية للأزرار" class="p-2 rounded-xl bg-[#131b2e] hover:bg-[#1a253e] text-slate-300 border border-[#22304d] transition text-xs">
-          <i id="sfx-icon" class="fa-solid fa-volume-high text-cyan-400"></i>
-        </button>
-
-        <!-- مؤشر جاهزية السيرفر -->
-        <div class="hidden lg:flex items-center gap-2 bg-[#131b2e] border border-[#22304d] px-3 py-1.5 rounded-2xl text-[11px]">
-          <span id="p2p-status-dot" class="w-2 h-2 rounded-full bg-amber-400 pulse-dot"></span>
-          <span id="p2p-status-label" class="text-slate-300">جاري إعداد السيرفر...</span>
-        </div>
-
-      </div>
-
-    </div>
-  </header>
-
-  <!-- ==================== 2. الواجهات المتنقلة ==================== -->
-  <main class="flex-grow flex items-center justify-center p-3 md:p-6 w-full max-w-7xl mx-auto">
-
-    <!-- أ. واجهة تسجيل الدخول الموحدة للمشرف والزبون -->
-    <section id="view-login" class="w-full max-w-md mx-auto">
-      <div class="bg-[#0d1322]/90 border border-[#1f293d] rounded-3xl p-6 md:p-8 shadow-2xl relative overflow-hidden backdrop-blur-2xl">
-        <div class="absolute -top-16 -right-16 w-40 h-40 bg-violet-600/15 rounded-full blur-3xl pointer-events-none"></div>
-        <div class="absolute -bottom-16 -left-16 w-40 h-40 bg-emerald-500/15 rounded-full blur-3xl pointer-events-none"></div>
-
-        <div class="text-center mb-6">
-          <div class="w-16 h-16 mx-auto mb-3.5 rounded-2xl bg-gradient-to-tr from-violet-600/20 to-cyan-500/20 border border-violet-500/40 flex items-center justify-center text-cyan-400 text-2xl shadow-inner">
-            <i class="fa-solid fa-shield-halved"></i>
-          </div>
-          <h2 class="text-xl font-black text-white">بوابة الاتصال المباشر</h2>
-          <p class="text-xs text-slate-400 mt-1 leading-relaxed">أدخل رمز الجلسة المستلم من التقني، أو رمز المشرف للوصول إلى لوحة التحكم</p>
-        </div>
-
-        <form onsubmit="handleUniversalLogin(event)" class="space-y-4">
-          <div>
-            <label class="block text-xs font-semibold text-slate-300 mb-2">أدخل الرمز السري (Passcode):</label>
-            <input 
-              type="text" 
-              id="login-passcode" 
-              placeholder="مثال: 889900 أو رمز الإدارة" 
-              class="w-full text-center text-xl font-black tracking-widest bg-[#050811] border border-[#22304d] rounded-2xl px-4 py-3.5 text-amber-300 placeholder-slate-600 focus:outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 transition uppercase"
-              required
-              autocomplete="off"
-            >
-            <p id="login-alert-text" class="text-xs text-rose-400 mt-2 text-center hidden font-medium"></p>
-          </div>
-
-          <button 
-            type="submit" 
-            onclick="playBeepTone(500, 0.08)"
-            class="w-full bg-gradient-to-r from-violet-600 via-indigo-600 to-cyan-600 hover:from-violet-500 hover:to-cyan-500 text-white font-bold py-3.5 px-4 rounded-2xl shadow-xl shadow-violet-600/25 transition flex items-center justify-center gap-2 text-sm"
-          >
-            <span>دخول إلى المنظومة</span>
-            <i class="fa-solid fa-arrow-left text-xs"></i>
-          </button>
-        </form>
-
-        <div class="mt-6 pt-4 border-t border-[#1b253b] text-center">
-          <p class="text-[11px] text-slate-500 flex items-center justify-center gap-1.5">
-            <i class="fa-solid fa-lock text-emerald-400"></i> اتصال مشفر بنظام P2P وخوادم Google STUN المتعددة
-          </p>
-        </div>
-      </div>
-    </section>
-
-    <!-- ب. واجهة الزبون (Client Portal) -->
-    <section id="view-client" class="w-full max-w-3xl hidden space-y-4">
-      
-      <!-- شريط حالة الزبون والجلسة -->
-      <div class="bg-[#0d1322] border border-[#1f293d] rounded-2xl p-4 shadow-xl flex items-center justify-between flex-wrap gap-3">
+    <!-- شريط علوي -->
+    <header class="bg-slate-900/90 backdrop-blur border-b border-slate-800 px-4 py-3 flex items-center justify-between sticky top-0 z-50">
         <div class="flex items-center gap-3">
-          <div class="relative">
-            <div class="w-12 h-12 rounded-2xl bg-violet-600/20 border border-violet-500/40 flex items-center justify-center text-violet-400 text-xl font-bold">
-              <i class="fa-solid fa-user-check"></i>
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-600 to-blue-600 flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-cyan-900/30">
+                <i class="fa-solid fa-screwdriver-wrench"></i>
             </div>
-            <span class="w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-[#0d1322] absolute -bottom-1 -left-1 pulse-dot"></span>
-          </div>
-          <div>
-            <h3 class="font-bold text-sm text-white" id="client-name-display">زبون الدعم المباشر</h3>
-            <div class="flex items-center gap-2 mt-0.5 text-xs text-slate-400">
-              <span>الهاتف: <strong class="text-slate-200" id="client-device-display">---</strong></span>
-              <span>•</span>
-              <span>كود الجلسة: <strong class="text-amber-400 font-mono font-bold" id="client-code-display">------</strong></span>
+            <div>
+                <h1 class="font-extrabold text-base md:text-lg text-slate-100 leading-tight">إلكترو نورالدين</h1>
+                <p class="text-xs text-cyan-400 font-medium">منصة الدعم الفني والصيانة عن بُعد</p>
             </div>
-          </div>
         </div>
 
-        <div class="flex items-center gap-2">
-          <!-- زر طلب اتصال فيديو بالتقني (يصدر رنيناً عند التقني) -->
-          <button 
-            id="client-request-call-btn"
-            onclick="initiateCallFrom('client')" 
-            class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs px-3.5 py-2.5 rounded-xl font-bold transition flex items-center gap-2 shadow-lg shadow-emerald-600/20"
-          >
-            <i class="fa-solid fa-video"></i>
-            <span id="client-call-btn-text">طلب مكالمة فيديو مع التقني</span>
-          </button>
-
-          <button 
-            onclick="logoutApp()" 
-            class="bg-[#151f33] hover:bg-rose-950 text-slate-300 hover:text-rose-300 text-xs px-3 py-2.5 rounded-xl border border-[#22304d] transition"
-          >
-            <i class="fa-solid fa-right-from-bracket"></i>
-            <span>خروج</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- عرض بث الشاشة ومكالمة الفيديو -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        
-        <!-- صندوق مشاركة الشاشة -->
-        <div class="bg-[#0d1322] border border-[#1f293d] rounded-2xl p-4 shadow-xl space-y-3">
-          <div class="flex items-center justify-between">
-            <h4 class="font-bold text-xs sm:text-sm text-white flex items-center gap-2">
-              <i class="fa-solid fa-tower-broadcast text-cyan-400"></i>
-              مشاركة شاشة هاتفك مع التقني
-            </h4>
-            <span id="client-screen-badge" class="text-[10px] px-2 py-0.5 rounded bg-[#131b2e] text-slate-400 border border-[#22304d]">متوقف</span>
-          </div>
-          <p class="text-xs text-slate-400 leading-relaxed">اضغط "بدء مشاركة الشاشة" ليتمكن التقني نورالدين من مشاهدة ما في هاتفك وتوجيهك خطوة بخطوة.</p>
-
-          <div class="flex gap-2">
-            <button 
-              id="client-start-screen-btn" 
-              onclick="startClientScreenShare()"
-              class="flex-1 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-bold py-2.5 px-3 rounded-xl text-xs transition shadow-lg shadow-violet-600/20 flex items-center justify-center gap-2"
-            >
-              <i class="fa-solid fa-play"></i>
-              <span>بدء مشاركة الشاشة</span>
-            </button>
-            <button 
-              id="client-stop-screen-btn" 
-              onclick="stopClientScreenShare()"
-              class="hidden flex-1 bg-rose-600 hover:bg-rose-500 text-white font-bold py-2.5 px-3 rounded-xl text-xs transition flex items-center justify-center gap-2"
-            >
-              <i class="fa-solid fa-stop"></i>
-              <span>إيقاف البث</span>
-            </button>
-          </div>
-
-          <!-- معاينة شاشة الزبون لديه -->
-          <div id="client-preview-box" class="hidden aspect-video rounded-xl bg-black border border-[#22304d] overflow-hidden relative">
-            <video id="client-preview-video" autoplay playsinline muted class="w-full h-full object-contain"></video>
-            <span class="absolute top-2 right-2 bg-black/80 px-2 py-0.5 rounded text-[10px] text-emerald-400 font-bold">
-              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block pulse-dot"></span> البث شغال
-            </span>
-          </div>
-        </div>
-
-        <!-- صندوق مكالمة الفيديو -->
-        <div class="bg-[#0d1322] border border-[#1f293d] rounded-2xl p-4 shadow-xl space-y-3">
-          <div class="flex items-center justify-between">
-            <h4 class="font-bold text-xs sm:text-sm text-white flex items-center gap-2">
-              <i class="fa-solid fa-video text-emerald-400"></i>
-              مكالمة الفيديو الحية
-            </h4>
-            <span id="client-call-badge" class="text-[10px] px-2 py-0.5 rounded bg-[#131b2e] text-slate-400 border border-[#22304d]">غير نشط</span>
-          </div>
-
-          <div class="aspect-video rounded-xl bg-[#050811] border border-[#1f293d] overflow-hidden relative flex items-center justify-center">
-            <video id="client-remote-video" autoplay playsinline class="w-full h-full object-cover hidden"></video>
-
-            <div id="client-call-placeholder" class="text-center p-4">
-              <i class="fa-solid fa-video-slash text-2xl text-slate-700 mb-1.5"></i>
-              <p class="text-xs text-slate-500">لا توجد مكالمة فيديو حالياً. اضغط "طلب مكالمة فيديو" في الأعلى لبدء الرنين.</p>
-            </div>
-
-            <!-- الكاميرا المحلية للزبون PiP -->
-            <video id="client-local-video" autoplay playsinline muted class="absolute bottom-2 left-2 w-20 h-20 rounded-xl border-2 border-violet-500 object-cover hidden shadow-xl bg-black"></video>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- محادثة الزبون (نص، تسجيل صوتي، صور) -->
-      <div class="bg-[#0d1322] border border-[#1f293d] rounded-2xl p-4 shadow-xl space-y-3">
-        <div class="flex items-center justify-between border-b border-[#1f293d] pb-2">
-          <h4 class="font-bold text-xs sm:text-sm text-white flex items-center gap-2">
-            <i class="fa-regular fa-comments text-violet-400"></i>
-            المحادثة المباشرة مع المشرف نورالدين
-          </h4>
-          <span class="text-[11px] text-emerald-400">P2P نشط ومحمي</span>
-        </div>
-
-        <div id="client-chat-box" class="h-60 overflow-y-auto space-y-2.5 p-3 bg-[#050811] rounded-xl border border-[#1b253b] text-xs">
-          <!-- الرسائل المتبادلة -->
-        </div>
-
-        <!-- شريط تسجيل الملاحظة الصوتية -->
-        <div id="client-voice-bar" class="hidden bg-rose-950/40 border border-rose-800/60 rounded-xl p-2.5 flex items-center justify-between text-xs">
-          <div class="flex items-center gap-2 text-rose-300">
-            <span class="w-2.5 h-2.5 rounded-full bg-rose-500 pulse-dot"></span>
-            <span>جاري تسجيل رسالة صوتية... (<span id="client-voice-timer">00:00</span>)</span>
-          </div>
-          <div class="flex items-center gap-2">
-            <button onclick="cancelVoiceNote('client')" class="px-2.5 py-1 rounded bg-[#131b2e] text-slate-300 text-[11px]">إلغاء</button>
-            <button onclick="stopAndSendVoiceNote('client')" class="px-3 py-1 rounded bg-rose-600 hover:bg-rose-500 text-white font-bold text-[11px]">إرسال الصوت</button>
-          </div>
-        </div>
-
-        <!-- أزرار الإدخال والوسائط -->
-        <div class="flex items-center gap-1.5">
-          <input 
-            type="text" 
-            id="client-input-msg" 
-            placeholder="اكتب استفسارك هنا..." 
-            class="flex-1 bg-[#050811] border border-[#22304d] rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-violet-500"
-            onkeydown="if(event.key === 'Enter') sendTextMessage('client')"
-          >
-
-          <label class="cursor-pointer bg-[#131b2e] hover:bg-[#1c2842] text-slate-300 p-2.5 rounded-xl border border-[#22304d] text-xs transition" title="إرسال صورة">
-            <i class="fa-solid fa-image text-cyan-400"></i>
-            <input type="file" accept="image/*" class="hidden" onchange="handleImageSend(event, 'client')">
-          </label>
-
-          <button 
-            onclick="startVoiceNote('client')" 
-            class="bg-[#131b2e] hover:bg-[#1c2842] text-slate-300 p-2.5 rounded-xl border border-[#22304d] text-xs transition" 
-            title="تسجيل رسالة صوتية"
-          >
-            <i class="fa-solid fa-microphone text-rose-400"></i>
-          </button>
-
-          <button 
-            onclick="sendTextMessage('client')" 
-            class="bg-violet-600 hover:bg-violet-500 text-white font-bold px-4 py-2.5 rounded-xl text-xs transition shadow-lg shadow-violet-600/30"
-          >
-            <i class="fa-solid fa-paper-plane text-[10px]"></i>
-            <span class="hidden sm:inline mr-1">إرسال</span>
-          </button>
-        </div>
-
-      </div>
-
-    </section>
-
-    <!-- ج. لوحة تحكم المشرف (Admin Control Hub) -->
-    <section id="view-admin" class="w-full hidden space-y-4">
-      
-      <!-- الشريط العلوي للأدمن -->
-      <div class="bg-[#0d1322] border border-[#1f293d] rounded-2xl p-4 shadow-xl flex flex-wrap items-center justify-between gap-3">
         <div class="flex items-center gap-3">
-          <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-violet-600 to-indigo-600 flex items-center justify-center text-white text-xl shadow-lg shadow-violet-600/30">
-            <i class="fa-solid fa-shield-virus"></i>
-          </div>
-          <div>
-            <div class="flex items-center gap-2">
-              <h2 class="font-black text-base md:text-lg text-white">لوحة تحكم إلكترو نورالدين</h2>
-              <span class="text-[11px] bg-violet-500/20 text-violet-300 border border-violet-500/40 px-2.5 py-0.5 rounded-full font-bold">المشرف العام</span>
+            <div id="connectionStatusBadge" class="hidden text-xs px-2.5 py-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span>سيرفر الاتصال نشط</span>
             </div>
-            <p class="text-xs text-slate-400">إدارة الجلسات المتعددة، المراقبة اللحظية، ومكالمات الفيديو بالرنين</p>
-          </div>
+            <button id="logoutBtn" onclick="logout()" class="hidden text-xs bg-slate-800 hover:bg-rose-900/50 hover:text-rose-400 border border-slate-700 px-3 py-1.5 rounded-lg transition">
+                <i class="fa-solid fa-right-from-bracket ml-1"></i> خروج
+            </button>
         </div>
+    </header>
 
-        <div class="flex items-center gap-2 flex-wrap">
-          <button 
-            onclick="openNewClientModal()" 
-            class="bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white text-xs font-bold px-3.5 py-2.5 rounded-xl shadow-lg shadow-violet-600/25 transition flex items-center gap-2"
-          >
-            <i class="fa-solid fa-user-plus"></i>
-            <span>توليد زبون جديد</span>
-          </button>
+    <!-- 1. شاشة الدخول الرئيسية -->
+    <main id="loginScreen" class="flex-1 flex items-center justify-center p-4">
+        <div class="w-full max-w-md bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl backdrop-blur relative overflow-hidden">
+            <div class="absolute -top-12 -left-12 w-32 h-32 bg-cyan-500/10 rounded-full blur-2xl pointer-events-none"></div>
+            <div class="absolute -bottom-12 -right-12 w-32 h-32 bg-blue-500/10 rounded-full blur-2xl pointer-events-none"></div>
 
-          <button 
-            onclick="openAdminSecurityModal()" 
-            class="bg-[#131b2e] hover:bg-[#1a253e] text-slate-300 text-xs font-medium px-3 py-2.5 rounded-xl border border-[#22304d] transition flex items-center gap-1.5"
-          >
-            <i class="fa-solid fa-key text-amber-400"></i>
-            <span>تعديل كود المشرف</span>
-          </button>
-
-          <button 
-            onclick="logoutApp()" 
-            class="bg-[#131b2e] hover:bg-rose-950 text-slate-300 hover:text-rose-300 text-xs px-3 py-2.5 rounded-xl border border-[#22304d] transition flex items-center gap-1"
-          >
-            <i class="fa-solid fa-power-off"></i>
-            <span>خروج</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- تبويبات التبديل بين الزبائن المتعددين -->
-      <div class="bg-[#0b101e] border border-[#1f293d] rounded-2xl p-2 flex items-center gap-2 overflow-x-auto shadow-inner" id="admin-clients-tabs">
-        <!-- تملأ ديناميكياً -->
-      </div>
-
-      <!-- تخطيط الشاشة: شاشة الهاتف الطولية + المكالمة والشات والتحكم -->
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
-        
-        <!-- العمود الأيمن (7 من 12): إطار الهاتف الطولي الذكي 9:19.5 -->
-        <div class="lg:col-span-7 space-y-4">
-          <div class="bg-[#0d1322] border border-[#1f293d] rounded-3xl p-4 md:p-6 shadow-2xl flex flex-col items-center">
-            
-            <div class="w-full flex items-center justify-between mb-3 text-xs">
-              <div class="flex items-center gap-2">
-                <span class="w-2.5 h-2.5 rounded-full bg-slate-500" id="admin-stream-dot"></span>
-                <span class="font-bold text-slate-200">بث شاشة الهاتف المباشر (Full View)</span>
-                <span id="admin-client-status-badge" class="px-2 py-0.5 rounded text-[10px] bg-slate-800 text-slate-400 border border-slate-700">غير متصل</span>
-              </div>
-              <div class="flex items-center gap-2">
-                <button onclick="toggleVideoAspectFill()" class="p-1.5 rounded-lg bg-[#131b2e] hover:bg-[#1a253e] text-slate-300 border border-[#22304d]" title="تغيير ملء الشاشة">
-                  <i class="fa-solid fa-arrows-to-eye"></i>
-                </button>
-                <button onclick="togglePhoneFullScreen()" class="p-1.5 rounded-lg bg-[#131b2e] hover:bg-[#1a253e] text-slate-300 border border-[#22304d]" title="ملء الشاشة بالكامل">
-                  <i class="fa-solid fa-expand"></i>
-                </button>
-              </div>
-            </div>
-
-            <!-- إطار الهاتف الذكي بنسبة 9:19.5 -->
-            <div class="phone-mockup-frame w-full max-w-[340px] flex items-center justify-center overflow-hidden">
-              <div class="phone-notch"></div>
-              
-              <video id="admin-phone-stream-video" autoplay playsinline class="w-full h-full object-contain hidden"></video>
-
-              <div id="admin-phone-placeholder" class="text-center p-6 space-y-3 z-10">
-                <div class="w-16 h-16 rounded-full bg-[#0d1322] border border-[#22304d] flex items-center justify-center mx-auto text-violet-400 text-2xl shadow-xl">
-                  <i class="fa-solid fa-mobile-screen"></i>
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 mx-auto mb-3 rounded-2xl bg-slate-800 border border-slate-700 flex items-center justify-center text-cyan-400 text-2xl shadow-inner">
+                    <i class="fa-solid fa-shield-halved"></i>
                 </div>
+                <h2 class="text-xl font-bold text-slate-100">تسجيل الدخول إلى الجلسة</h2>
+                <p class="text-xs text-slate-400 mt-1">أدخل الكود المخصص لبدء التواصل أو إدارة النظام</p>
+            </div>
+
+            <div class="space-y-4">
                 <div>
-                  <h4 class="font-bold text-sm text-white" id="admin-stream-title">في انتظار بدء البث</h4>
-                  <p class="text-xs text-slate-400 mt-1 max-w-[220px] mx-auto leading-relaxed">
-                    عندما يضغط الزبون على "بدء مشاركة الشاشة" ستظهر شاشة هاتفه كاملة هنا لتتمكن من إرشاده.
-                  </p>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1.5">كود الدخول (الزبون أو الأدمن)</label>
+                    <div class="relative">
+                        <input type="text" id="accessCodeInput" placeholder="أدخل الكود هنا..." class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-center text-lg font-mono tracking-widest text-white focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition">
+                        <i class="fa-solid fa-key absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-sm"></i>
+                    </div>
                 </div>
-                <button onclick="runPhoneSimulationDemo()" class="text-[11px] bg-[#131b2e] hover:bg-[#1a253e] text-cyan-300 px-3.5 py-1.5 rounded-xl border border-cyan-500/30 transition">
-                  <i class="fa-solid fa-wand-magic-sparkles ml-1"></i> اختبار شاشة محاكاة تجريبية
+
+                <div id="loginError" class="hidden text-xs text-rose-400 bg-rose-950/40 border border-rose-800/60 p-2.5 rounded-lg text-center font-medium"></div>
+
+                <button onclick="handleLogin()" class="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold py-3 px-4 rounded-xl shadow-lg shadow-cyan-900/30 active:scale-[0.98] transition flex items-center justify-center gap-2">
+                    <span>دخول</span>
+                    <i class="fa-solid fa-arrow-left text-sm"></i>
                 </button>
-              </div>
 
+                <div class="pt-3 border-t border-slate-800/80 text-center">
+                    <button onclick="fillAdminCode()" class="text-xs text-slate-400 hover:text-cyan-400 transition flex items-center justify-center gap-1.5 mx-auto">
+                        <i class="fa-solid fa-user-gear"></i>
+                        <span>دخول سريع للوحة التحكم (كود الأدمن الافتراضي: 1234)</span>
+                    </button>
+                </div>
             </div>
-
-            <!-- شريط بيانات الهاتف المفتوح -->
-            <div class="w-full mt-4 pt-3 border-t border-[#1b253b] flex items-center justify-between text-xs text-slate-400">
-              <span id="admin-phone-device-text"><i class="fa-solid fa-mobile-screen-button text-cyan-400 ml-1"></i> الهاتف: جاري التحميل...</span>
-              <span id="admin-phone-code-text" class="font-mono text-amber-400 font-bold">كود: ----</span>
-            </div>
-
-          </div>
         </div>
+    </main>
 
-        <!-- العمود الأيسر (5 من 12): مكالمة الفيديو، المحادثة، والتحكم بالزبون -->
-        <div class="lg:col-span-5 space-y-4">
-          
-          <!-- صندوق مكالمة الفيديو للأدمن -->
-          <div class="bg-[#0d1322] border border-[#1f293d] rounded-2xl p-4 shadow-xl space-y-3">
-            <div class="flex items-center justify-between">
-              <h3 class="font-bold text-xs sm:text-sm text-white flex items-center gap-2">
-                <i class="fa-solid fa-video text-emerald-400"></i>
-                مكالمة الفيديو مع الزبون
-              </h3>
-              <!-- زر الاتصال بالزبون مع إطلاق رنين في هاتفه -->
-              <button 
-                id="admin-call-btn"
-                onclick="initiateCallFrom('admin')" 
-                class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-3 py-1.5 rounded-xl transition flex items-center gap-1.5 shadow-md shadow-emerald-600/20"
-              >
-                <i class="fa-solid fa-phone"></i>
-                <span id="admin-call-btn-text">الاتصال بالزبون</span>
-              </button>
+    <!-- 2. لوحة تحكم الأدمن (Admin Dashboard) -->
+    <main id="adminScreen" class="hidden flex-1 p-4 md:p-6 max-w-7xl mx-auto w-full">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            
+            <!-- العمود الجانبي: إدارة الزبائن وتوليد الأكواد -->
+            <div class="lg:col-span-4 space-y-6">
+                <!-- بطاقة إنشاء جلسة زبون -->
+                <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 shadow-lg">
+                    <h3 class="text-sm font-bold text-slate-100 flex items-center gap-2 mb-4">
+                        <i class="fa-solid fa-user-plus text-cyan-400"></i>
+                        <span>إنشاء جلسة جديدة للزبون</span>
+                    </h3>
+
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">اسم الزبون</label>
+                            <input type="text" id="newClientName" placeholder="مثال: محمد السطاتي" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-cyan-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">نوع الهاتف أو العطل</label>
+                            <input type="text" id="newClientDevice" placeholder="مثال: Samsung A51 - متوقف" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-cyan-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">رقم الهاتف (اختياري للواتساب)</label>
+                            <input type="text" id="newClientPhone" placeholder="06XXXXXXXX" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-cyan-500">
+                        </div>
+
+                        <button onclick="createNewClientSession()" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-2.5 px-4 rounded-xl text-sm transition flex items-center justify-center gap-2 shadow-md shadow-cyan-950">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i>
+                            <span>توليد كود ورابط الجلسة</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- قائمة الجلسات المسجلة -->
+                <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 shadow-lg">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="text-sm font-bold text-slate-100 flex items-center gap-2">
+                            <i class="fa-solid fa-users text-cyan-400"></i>
+                            <span>جلسات الزبائن</span>
+                        </h3>
+                        <span id="clientsCount" class="text-xs bg-slate-800 text-cyan-400 px-2 py-0.5 rounded-full font-bold">0</span>
+                    </div>
+
+                    <div id="clientsList" class="space-y-2 max-h-[350px] overflow-y-auto pr-1">
+                        <!-- تضاف بطاقات الزبائن هنا برمجياً -->
+                    </div>
+                </div>
             </div>
 
-            <div class="aspect-video bg-[#050811] rounded-xl border border-[#1f293d] overflow-hidden relative flex items-center justify-center">
-              <video id="admin-remote-video" autoplay playsinline class="w-full h-full object-cover hidden"></video>
+            <!-- العمود الرئيسي: شاشة الهاتف لايف والشات -->
+            <div class="lg:col-span-8 space-y-6">
+                <!-- بطاقة الجلسة النشطة -->
+                <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 md:p-5 shadow-lg flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                            <h2 id="activeClientTitle" class="font-bold text-slate-100 text-base md:text-lg">اختر جلسة للمتابعة</h2>
+                        </div>
+                        <p id="activeClientSubtitle" class="text-xs text-slate-400 mt-0.5">لم يتم اختيار أي زبون حتى الآن</p>
+                    </div>
 
-              <div id="admin-call-placeholder" class="text-center p-3">
-                <i class="fa-solid fa-video-slash text-2xl text-slate-700 mb-1.5"></i>
-                <p class="text-xs text-slate-500">لا توجد مكالمة جارية. اضغط "الاتصال بالزبون" ليرن هاتفه فوراً.</p>
-              </div>
+                    <div class="flex items-center gap-2 w-full md:w-auto">
+                        <button onclick="startAdminCall()" class="flex-1 md:flex-initial bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-3 py-2 rounded-xl transition flex items-center justify-center gap-1.5 shadow">
+                            <i class="fa-solid fa-video"></i>
+                            <span>مكالمة فيديو</span>
+                        </button>
+                        <button onclick="clearCurrentChat()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs px-3 py-2 rounded-xl transition" title="مسح محادثة الزبون">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    </div>
+                </div>
 
-              <video id="admin-local-video" autoplay playsinline muted class="absolute bottom-2 left-2 w-20 h-20 rounded-xl border-2 border-violet-500 object-cover hidden shadow-xl bg-black"></video>
+                <!-- الحاوية المزدوجة: الشاشة لايف + الشات المباشر -->
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
+                    
+                    <!-- إطار الهاتف للبث المباشر -->
+                    <div class="md:col-span-6 flex flex-col items-center">
+                        <div class="text-xs text-slate-400 font-semibold mb-2 flex items-center gap-1.5">
+                            <i class="fa-solid fa-mobile-screen-button text-cyan-400"></i>
+                            <span>شاشة هاتف الزبون (بث مباشر)</span>
+                        </div>
+                        <div class="phone-frame w-full max-w-[280px] flex items-center justify-center bg-slate-950 relative">
+                            <!-- فيديو مشاركة شاشة الزبون -->
+                            <video id="clientScreenVideo" autoplay playsinline class="w-full h-full object-contain hidden"></video>
+
+                            <!-- شاشة انتظار قبل بدء المشاركة -->
+                            <div id="noStreamPlaceholder" class="p-6 text-center text-slate-600 space-y-3">
+                                <i class="fa-solid fa-display text-4xl animate-bounce text-slate-700"></i>
+                                <p class="text-xs leading-relaxed text-slate-500">في انتظار موافقة وبدء الزبون لمشاركة شاشته من هاتفه</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- صندوق المحادثة والرسائل الفورية -->
+                    <div class="md:col-span-6 bg-slate-900/90 border border-slate-800 rounded-2xl h-[520px] flex flex-col shadow-lg overflow-hidden">
+                        <div class="p-3 border-b border-slate-800 bg-slate-950/60 flex items-center justify-between text-xs text-slate-300">
+                            <span class="font-bold flex items-center gap-1.5">
+                                <i class="fa-solid fa-comments text-cyan-400"></i>
+                                <span>المحادثة المباشرة</span>
+                            </span>
+                            <span id="chatStatusText" class="text-slate-500">جاهز للتواصل</span>
+                        </div>
+
+                        <!-- سجل الرسائل -->
+                        <div id="adminChatMessages" class="flex-1 p-3 overflow-y-auto space-y-2.5 text-xs">
+                            <div class="text-center text-slate-600 my-4 text-[11px]">بداية المحادثة المشفرة للجلسة</div>
+                        </div>
+
+                        <!-- إرسال الرسائل -->
+                        <div class="p-2.5 border-t border-slate-800 bg-slate-950/40 flex items-center gap-2">
+                            <input type="text" id="adminMsgInput" placeholder="اكتب توجيهاً للزبون..." class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500" onkeydown="if(event.key==='Enter') sendAdminMessage()">
+                            <button onclick="sendAdminMessage()" class="bg-cyan-600 hover:bg-cyan-500 text-white w-9 h-9 rounded-xl flex items-center justify-center transition shadow">
+                                <i class="fa-solid fa-paper-plane text-xs"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
             </div>
-          </div>
 
-          <!-- شات المحادثة للأدمن -->
-          <div class="bg-[#0d1322] border border-[#1f293d] rounded-2xl p-4 shadow-xl space-y-3">
-            <div class="flex items-center justify-between border-b border-[#1f293d] pb-2">
-              <h3 class="font-bold text-xs sm:text-sm text-white flex items-center gap-2">
-                <i class="fa-regular fa-comments text-violet-400"></i>
-                محادثة الزبون المحدد
-              </h3>
-              <div class="flex items-center gap-2">
-                <button onclick="clearActiveChatOnly()" class="text-xs text-rose-400 hover:underline flex items-center gap-1">
-                  <i class="fa-solid fa-broom"></i>
-                  <span>مسح الشات</span>
+        </div>
+    </main>
+
+    <!-- 3. شاشة الزبون (Client Portal) -->
+    <main id="clientScreen" class="hidden flex-1 p-4 max-w-lg mx-auto w-full">
+        <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-6">
+            <div class="text-center border-b border-slate-800 pb-4">
+                <div class="w-14 h-14 mx-auto rounded-2xl bg-cyan-950/60 border border-cyan-800/50 flex items-center justify-center text-cyan-400 text-2xl mb-2 shadow">
+                    <i class="fa-solid fa-headset"></i>
+                </div>
+                <h2 id="clientPortalName" class="text-lg font-bold text-slate-100">مرحباً بك</h2>
+                <p id="clientPortalDevice" class="text-xs text-slate-400">جلسة الدعم الفني المباشر</p>
+            </div>
+
+            <!-- أزرار مشاركة الشاشة والمكالمة -->
+            <div class="space-y-3">
+                <button id="startShareBtn" onclick="toggleScreenShare()" class="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold py-3.5 px-4 rounded-2xl text-sm transition shadow-lg shadow-cyan-950 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-display"></i>
+                    <span id="shareBtnText">بدء مشاركة شاشة هاتفي</span>
                 </button>
-              </div>
+
+                <p class="text-[11px] text-slate-500 text-center leading-normal">
+                    بمجرد الضغط، ستظهر نافذة من هاتفك تطلب الإذن بعرض الشاشة لمساعدة التقني في توجيهك خطوة بخطوة.
+                </p>
             </div>
 
-            <!-- أزرار الإرشادات السريعة بنقرة واحدة -->
-            <div class="flex flex-wrap gap-1 text-[10px]">
-              <button onclick="sendQuickTipMessage('ادخل إلى الإعدادات ثم التطبيقات')" class="px-2 py-1 rounded bg-[#131b2e] hover:bg-[#1c2842] text-slate-300 border border-[#22304d]">⚙️ فتح الإعدادات</button>
-              <button onclick="sendQuickTipMessage('امسح ذاكرة التخزين المؤقت (Vider le cache)')" class="px-2 py-1 rounded bg-[#131b2e] hover:bg-[#1c2842] text-slate-300 border border-[#22304d]">🧹 مسح الكاش</button>
-              <button onclick="sendQuickTipMessage('أعد تشغيل الهاتف (Redémarrer) وانتظر دقيقة')" class="px-2 py-1 rounded bg-[#131b2e] hover:bg-[#1c2842] text-slate-300 border border-[#22304d]">🔄 إعادة التشغيل</button>
+            <!-- شات الزبون -->
+            <div class="bg-slate-950 border border-slate-800 rounded-2xl h-64 flex flex-col overflow-hidden">
+                <div class="px-3 py-2 bg-slate-900/80 border-b border-slate-800 text-xs font-semibold text-slate-300 flex items-center justify-between">
+                    <span>تعليمات التقني</span>
+                    <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                </div>
+                <div id="clientChatMessages" class="flex-1 p-3 overflow-y-auto space-y-2 text-xs">
+                    <div class="bg-slate-900 border border-slate-800 p-2.5 rounded-xl text-slate-300">
+                        مرحباً بك في خدمة إلكترو نورالدين. نحن معك الآن لإرشادك وإصلاح المشكل.
+                    </div>
+                </div>
+                <div class="p-2 border-t border-slate-800 flex items-center gap-2">
+                    <input type="text" id="clientMsgInput" placeholder="اكتب ردك للتقني..." class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500" onkeydown="if(event.key==='Enter') sendClientMessage()">
+                    <button onclick="sendClientMessage()" class="bg-cyan-600 hover:bg-cyan-500 text-white w-8 h-8 rounded-xl flex items-center justify-center transition">
+                        <i class="fa-solid fa-paper-plane text-xs"></i>
+                    </button>
+                </div>
             </div>
-
-            <!-- صندوق الرسائل للأدمن -->
-            <div id="admin-chat-box" class="h-56 overflow-y-auto space-y-2.5 p-3 bg-[#050811] rounded-xl border border-[#1b253b] text-xs">
-              <!-- رسائل الشات -->
-            </div>
-
-            <!-- شريط التسجيل الصوتي للأدمن -->
-            <div id="admin-voice-bar" class="hidden bg-rose-950/40 border border-rose-800/60 rounded-xl p-2.5 flex items-center justify-between text-xs">
-              <div class="flex items-center gap-2 text-rose-300">
-                <span class="w-2.5 h-2.5 rounded-full bg-rose-500 pulse-dot"></span>
-                <span>تسجيل رسالة صوتية... (<span id="admin-voice-timer">00:00</span>)</span>
-              </div>
-              <div class="flex items-center gap-2">
-                <button onclick="cancelVoiceNote('admin')" class="px-2.5 py-1 rounded bg-[#131b2e] text-slate-300 text-[11px]">إلغاء</button>
-                <button onclick="stopAndSendVoiceNote('admin')" class="px-3 py-1 rounded bg-rose-600 hover:bg-rose-500 text-white font-bold text-[11px]">إرسال الصوت</button>
-              </div>
-            </div>
-
-            <!-- حقل الإدخال والوسائط -->
-            <div class="flex items-center gap-1.5">
-              <input 
-                type="text" 
-                id="admin-input-msg" 
-                placeholder="اكتب تعليمات للزبون..." 
-                class="flex-1 bg-[#050811] border border-[#22304d] rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-violet-500"
-                onkeydown="if(event.key === 'Enter') sendTextMessage('admin')"
-              >
-
-              <label class="cursor-pointer bg-[#131b2e] hover:bg-[#1c2842] text-slate-300 p-2.5 rounded-xl border border-[#22304d] text-xs transition" title="إرسال صورة">
-                <i class="fa-solid fa-image text-cyan-400"></i>
-                <input type="file" accept="image/*" class="hidden" onchange="handleImageSend(event, 'admin')">
-              </label>
-
-              <button 
-                onclick="startVoiceNote('admin')" 
-                class="bg-[#131b2e] hover:bg-[#1c2842] text-slate-300 p-2.5 rounded-xl border border-[#22304d] text-xs transition" 
-                title="تسجيل رسالة صوتية"
-              >
-                <i class="fa-solid fa-microphone text-rose-400"></i>
-              </button>
-
-              <button 
-                onclick="sendTextMessage('admin')" 
-                class="bg-violet-600 hover:bg-violet-500 text-white font-bold px-4 py-2.5 rounded-xl text-xs transition shadow-lg shadow-violet-600/30"
-              >
-                <i class="fa-solid fa-paper-plane text-[10px]"></i>
-              </button>
-            </div>
-          </div>
-
-          <!-- إدارة الجلسة والتحكم بالزبون -->
-          <div class="bg-[#0d1322] border border-[#1f293d] rounded-2xl p-4 shadow-xl space-y-3">
-            <div class="flex items-center justify-between border-b border-[#1f293d] pb-2">
-              <h4 class="font-bold text-xs text-white flex items-center gap-2">
-                <i class="fa-solid fa-sliders text-amber-400"></i>
-                إدارة الجلسة وبيانات الزبون
-              </h4>
-              <button onclick="editCurrentClientDetails()" class="text-xs text-violet-400 hover:underline">تعديل البيانات</button>
-            </div>
-
-            <div class="grid grid-cols-2 gap-2 text-xs">
-              <div class="bg-[#050811] p-2.5 rounded-xl border border-[#1b253b]">
-                <span class="text-slate-500 block text-[10px]">كود الدخول المخصص:</span>
-                <span id="active-card-code" class="font-mono font-bold text-amber-400 text-sm">------</span>
-              </div>
-              <div class="bg-[#050811] p-2.5 rounded-xl border border-[#1b253b]">
-                <span class="text-slate-500 block text-[10px]">رقم هاتف الزبون:</span>
-                <span id="active-card-phone" class="font-bold text-slate-200">------</span>
-              </div>
-            </div>
-
-            <div class="flex items-center gap-2 pt-1 text-xs flex-wrap">
-              <button onclick="copyClientInviteLink()" class="flex-1 bg-emerald-700 hover:bg-emerald-600 text-white font-bold py-2 rounded-xl transition flex items-center justify-center gap-1.5 min-w-[170px] shadow-md shadow-emerald-700/20">
-                <i class="fa-brands fa-whatsapp text-sm"></i>
-                <span>نسخ رابط واتساب السحري</span>
-              </button>
-
-              <button onclick="terminateActiveClient()" class="bg-amber-950 hover:bg-amber-900 text-amber-300 px-3 py-2 rounded-xl border border-amber-800 transition flex items-center gap-1" title="طرد الزبون وإنهاء جلسته">
-                <i class="fa-solid fa-user-slash"></i>
-                <span>طرد الزبون</span>
-              </button>
-
-              <button onclick="deleteActiveClientRecord()" class="bg-rose-950 hover:bg-rose-900 text-rose-300 px-3 py-2 rounded-xl border border-rose-800 transition" title="حذف الزبون نهائياً">
-                <i class="fa-regular fa-trash-can"></i>
-              </button>
-            </div>
-          </div>
-
         </div>
+    </main>
 
-      </div>
+    <!-- نافذة مكالمة الفيديو -->
+    <div id="videoModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-xl p-4 shadow-2xl relative">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-3">
+                <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-video text-emerald-400"></i>
+                    <span>مكالمة فيديو مباشرة</span>
+                </h3>
+                <button onclick="closeVideoModal()" class="text-slate-400 hover:text-white p-1">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            
+            <div class="relative aspect-video bg-black rounded-2xl overflow-hidden mb-4 border border-slate-800">
+                <video id="remoteVideo" autoplay playsinline class="w-full h-full object-cover"></video>
+                <video id="localVideo" autoplay playsinline muted class="absolute bottom-3 left-3 w-28 h-20 rounded-xl object-cover border-2 border-cyan-500 shadow-lg"></video>
+            </div>
 
-    </section>
-
-  </main>
-
-  <!-- ==================== 3. نافذة استقبال الرنين والمكالمة الواردة (Incoming Call Modal) ==================== -->
-  <div id="modal-incoming-call" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
-    <div class="bg-[#0d1322] border-2 border-emerald-500/60 rounded-3xl max-w-sm w-full p-6 text-center shadow-2xl relative animate-ringing">
-      
-      <div class="w-20 h-20 rounded-full bg-emerald-500/20 border-2 border-emerald-400 flex items-center justify-center mx-auto text-emerald-400 text-3xl mb-4 shadow-lg shadow-emerald-500/30">
-        <i class="fa-solid fa-phone-volume"></i>
-      </div>
-
-      <h3 class="text-lg font-black text-white" id="incoming-caller-title">مكالمة واردة...</h3>
-      <p class="text-xs text-slate-300 mt-1" id="incoming-caller-subtitle">يرغب في بدء مكالمة فيديو وصوت معك</p>
-
-      <div class="mt-6 flex items-center justify-center gap-4">
-        <!-- زر قبول المكالمة -->
-        <button onclick="acceptIncomingCall()" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 px-4 rounded-2xl shadow-xl shadow-emerald-600/30 transition flex items-center justify-center gap-2 text-xs">
-          <i class="fa-solid fa-phone"></i>
-          <span>قبول المكالمة</span>
-        </button>
-
-        <!-- زر رفض المكالمة -->
-        <button onclick="rejectIncomingCall()" class="flex-1 bg-rose-600 hover:bg-rose-500 text-white font-bold py-3 px-4 rounded-2xl shadow-xl shadow-rose-600/30 transition flex items-center justify-center gap-2 text-xs">
-          <i class="fa-solid fa-phone-slash"></i>
-          <span>رفض</span>
-        </button>
-      </div>
-
+            <div class="flex justify-center gap-3">
+                <button onclick="closeVideoModal()" class="bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold px-6 py-2.5 rounded-xl transition flex items-center gap-2 shadow">
+                    <i class="fa-solid fa-phone-slash"></i>
+                    <span>إنهاء المكالمة</span>
+                </button>
+            </div>
+        </div>
     </div>
-  </div>
 
-  <!-- ==================== 4. النوافذ المنبثقة الإدارية ==================== -->
-  <!-- إنشاء زبون جديد -->
-  <div id="modal-new-client" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-    <div class="bg-[#0d1322] border border-[#1f293d] rounded-3xl max-w-md w-full p-6 space-y-4 shadow-2xl">
-      <div class="flex items-center justify-between border-b border-[#1f293d] pb-3">
-        <h3 class="font-bold text-sm text-white flex items-center gap-2">
-          <i class="fa-solid fa-user-plus text-violet-400"></i>
-          إنشاء زبون وتوليد كود جلسة
-        </h3>
-        <button onclick="closeNewClientModal()" class="text-slate-400 hover:text-white">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
-      </div>
-
-      <div class="space-y-3 text-xs">
-        <div>
-          <label class="block text-slate-300 mb-1 font-semibold">اسم الزبون:</label>
-          <input type="text" id="modal-client-name" placeholder="مثال: يوسف التازي" class="w-full bg-[#050811] border border-[#22304d] rounded-xl px-3 py-2 text-white placeholder-slate-600 focus:outline-none focus:border-violet-500">
-        </div>
-
-        <div>
-          <label class="block text-slate-300 mb-1 font-semibold">نوع وموديل الهاتف:</label>
-          <input type="text" id="modal-client-device" placeholder="مثال: Samsung Galaxy A54 أو iPhone 13" class="w-full bg-[#050811] border border-[#22304d] rounded-xl px-3 py-2 text-white placeholder-slate-600 focus:outline-none focus:border-violet-500">
-        </div>
-
-        <div>
-          <label class="block text-slate-300 mb-1 font-semibold">رقم الهاتف:</label>
-          <input type="tel" id="modal-client-phone" placeholder="مثال: 0612345678" class="w-full bg-[#050811] border border-[#22304d] rounded-xl px-3 py-2 text-white placeholder-slate-600 focus:outline-none focus:border-violet-500">
-        </div>
-
-        <div>
-          <label class="block text-slate-300 mb-1 font-semibold">كود الجلسة:</label>
-          <div class="flex gap-2">
-            <input type="text" id="modal-client-code" class="w-full text-center font-mono font-bold tracking-widest bg-[#050811] border border-[#22304d] rounded-xl px-3 py-2 text-amber-400 text-sm" maxlength="8">
-            <button onclick="generateRandomClientCode()" class="bg-[#131b2e] hover:bg-[#1a253e] px-3 py-2 rounded-xl text-slate-300 border border-[#22304d]">
-              <i class="fa-solid fa-arrows-rotate"></i>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <div class="pt-3 flex gap-2">
-        <button onclick="saveNewClientRecord()" class="flex-1 bg-violet-600 hover:bg-violet-500 text-white font-bold py-2.5 rounded-xl text-xs transition shadow-lg shadow-violet-600/30">
-          حفظ وتفعيل الجلسة
-        </button>
-        <button onclick="closeNewClientModal()" class="px-4 bg-[#131b2e] text-slate-300 py-2.5 rounded-xl text-xs">
-          إلغاء
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- تعديل كود المشرف -->
-  <div id="modal-admin-key" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-    <div class="bg-[#0d1322] border border-[#1f293d] rounded-3xl max-w-sm w-full p-6 space-y-4 shadow-2xl">
-      <div class="flex items-center justify-between border-b border-[#1f293d] pb-3">
-        <h3 class="font-bold text-sm text-white flex items-center gap-2">
-          <i class="fa-solid fa-key text-amber-400"></i>
-          تغيير رمز دخول المشرف
-        </h3>
-        <button onclick="closeAdminSecurityModal()" class="text-slate-400 hover:text-white">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
-      </div>
-
-      <div class="space-y-3 text-xs">
-        <div>
-          <label class="block text-slate-300 mb-1 font-semibold">الرمز الجديد:</label>
-          <input type="text" id="admin-key-input" class="w-full text-center font-mono font-bold tracking-widest bg-[#050811] border border-[#22304d] rounded-xl px-3 py-2.5 text-amber-400 text-base">
-        </div>
-      </div>
-
-      <div class="pt-2 flex gap-2">
-        <button onclick="saveAdminNewKey()" class="flex-1 bg-amber-600 hover:bg-amber-500 text-white font-bold py-2.5 rounded-xl text-xs transition">
-          حفظ الرمز
-        </button>
-        <button onclick="closeAdminSecurityModal()" class="px-4 bg-[#131b2e] text-slate-300 py-2.5 rounded-xl text-xs">
-          إلغاء
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- تكبير الصورة المرفقة -->
-  <div id="modal-lightbox" onclick="closeLightbox()" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden cursor-zoom-out">
-    <div class="max-w-3xl max-h-[90vh] overflow-hidden rounded-2xl relative" onclick="event.stopPropagation()">
-      <img id="lightbox-img" src="" alt="معاينة" class="w-full h-auto max-h-[85vh] object-contain rounded-xl">
-      <button onclick="closeLightbox()" class="absolute top-3 left-3 bg-[#0d1322]/80 text-white p-2 rounded-full border border-slate-700">
-        <i class="fa-solid fa-xmark"></i>
-      </button>
-    </div>
-  </div>
-
-  <!-- تذييل المنصة -->
-  <footer class="bg-[#050811] border-t border-[#131b2e] py-3 text-center text-[11px] text-slate-500 px-4">
-    <p>منصة إلكترو نورالدين للدعم الفني المباشر &copy; 2026 - اتصال P2P مشفر عبر شبكات الهاتف والإنترنت</p>
-  </footer>
-
-  <!-- ==================== 5. الكود البرمجي الشامل للمنظومة ==================== -->
-  <script>
-    /* ================= 1. التخزين المحلي والحالة العامة ================= */
-    const KEY_ADMIN_PASS = 'electro_admin_pwd_v4';
-    const KEY_CLIENTS = 'electro_clients_list_v4';
-    const KEY_CHATS = 'electro_chats_v4';
-
-    let adminPasscode = localStorage.getItem(KEY_ADMIN_PASS) || '1234';
-
-    let clientsDatabase = [];
-    try {
-      clientsDatabase = JSON.parse(localStorage.getItem(KEY_CLIENTS)) || [];
-    } catch(e) {
-      clientsDatabase = [];
-    }
-
-    let chatsDatabase = {};
-    try {
-      chatsDatabase = JSON.parse(localStorage.getItem(KEY_CHATS)) || {};
-    } catch(e) {
-      chatsDatabase = {};
-    }
-
-    function syncClientsStorage() {
-      localStorage.setItem(KEY_CLIENTS, JSON.stringify(clientsDatabase));
-    }
-
-    function syncChatsStorage() {
-      localStorage.setItem(KEY_CHATS, JSON.stringify(chatsDatabase));
-    }
-
-    let userRole = null; 
-    let currentClientObj = null; 
-    let activeAdminClientCode = null; 
-    let onlineStatusMap = {}; 
-
-    /* ================= 2. محرك WebRTC وسيرفرات Google STUN المتعددة ================= */
-    let myPeer = null;
-    const PEER_PREFIX = 'electro-v4-room-';
-    let dataConnections = {}; 
-    let activeMediaStream = null;
-    let localScreenStream = null;
-    let localCameraStream = null;
-
-    // خوادم STUN متعددة من Google لتخطي شبكات 4G و WiFi بالمغرب
-    const rtcConfig = {
-      iceServers: [
-        { urls: 'stun:stun.l.google.com:19302' },
-        { urls: 'stun:stun1.l.google.com:19302' },
-        { urls: 'stun:stun2.l.google.com:19302' },
-        { urls: 'stun:stun3.l.google.com:19302' },
-        { urls: 'stun:stun4.l.google.com:19302' },
-        { urls: 'stun:global.stun.twilio.com:3478' }
-      ]
-    };
-
-    function startPeerEngine(uniqueId, onReady) {
-      setServerIndicator("جاري ربط السيرفر السحابي...", "amber");
-
-      try {
-        if (myPeer) {
-          myPeer.destroy();
-        }
-
-        myPeer = new Peer(uniqueId, {
-          debug: 1,
-          config: rtcConfig
-        });
-
-        myPeer.on('open', (id) => {
-          setServerIndicator("الاتصال بالسيرفر جاهز ومؤمن", "emerald");
-          if (onReady) onReady(id);
-        });
-
-        myPeer.on('connection', (conn) => {
-          registerDataConnection(conn);
-        });
-
-        myPeer.on('call', (call) => {
-          handleIncomingCallSignal(call);
-        });
-
-        myPeer.on('error', (err) => {
-          console.warn("PeerJS Warning/Error:", err);
-          setServerIndicator("السيرفر متصل", "emerald");
-        });
-
-      } catch (err) {
-        console.error("PeerJS initialization error:", err);
-        setServerIndicator("وضع محلي", "slate");
-      }
-    }
-
-    function setServerIndicator(text, color) {
-      const dot = document.getElementById('p2p-status-dot');
-      const label = document.getElementById('p2p-status-label');
-      if (label) label.textContent = text;
-      if (dot) {
-        dot.className = `w-2 h-2 rounded-full pulse-dot ${
-          color === 'emerald' ? 'bg-emerald-400' : color === 'amber' ? 'bg-amber-400' : 'bg-slate-400'
-        }`;
-      }
-    }
-
-    function registerDataConnection(conn) {
-      conn.on('open', () => {
-        const clientCode = conn.metadata?.clientCode;
-        if (clientCode && userRole === 'admin') {
-          dataConnections[clientCode] = conn;
-          setClientOnline(clientCode, true);
-        }
-      });
-
-      conn.on('data', (data) => {
-        handleIncomingDataPayload(data, conn);
-      });
-
-      conn.on('close', () => {
-        const clientCode = conn.metadata?.clientCode;
-        if (clientCode && userRole === 'admin') {
-          delete dataConnections[clientCode];
-          setClientOnline(clientCode, false);
-        }
-      });
-    }
-
-    function setClientOnline(code, isOnline) {
-      onlineStatusMap[code] = isOnline;
-      if (isOnline) {
-        playToneSequence('join');
-      } else {
-        playToneSequence('leave');
-      }
-      renderAdminTabs();
-      updateAdminActiveClientHeader();
-    }
-
-    function updateAdminActiveClientHeader() {
-      if (userRole !== 'admin') return;
-      const isOnline = !!onlineStatusMap[activeAdminClientCode];
-      const badge = document.getElementById('admin-client-status-badge');
-      const dot = document.getElementById('admin-stream-dot');
-
-      if (badge) {
-        if (isOnline) {
-          badge.textContent = "الزبون متصل الآن (Online)";
-          badge.className = "px-2 py-0.5 rounded text-[10px] bg-emerald-950 text-emerald-300 border border-emerald-800";
-        } else {
-          badge.textContent = "الزبون غير متصل";
-          badge.className = "px-2 py-0.5 rounded text-[10px] bg-rose-950 text-rose-300 border border-rose-800";
-        }
-      }
-
-      if (dot) {
-        dot.className = `w-2.5 h-2.5 rounded-full ${isOnline ? 'bg-emerald-400 pulse-dot' : 'bg-rose-500'}`;
-      }
-    }
-
-    /* ================= 3. نظام الرنين وقبول / رفض المكالمات ================= */
-    let pendingCallRequest = null;
-    let pendingIncomingCallObject = null;
-    let isRinging = false;
-    let ringInterval = null;
-
-    // تشغيل جرس الرنين الإلكتروني الواقعي (Dual-Tone Electronic Ring)
-    function startRingingAudio() {
-      if (isRinging) return;
-      isRinging = true;
-
-      function ringCycle() {
-        if (!isRinging) return;
-        const ctx = getAudioContext();
-        const now = ctx.currentTime;
-
-        // ترددات رنين الهاتف النقال الكلاسيكي المزدوج (440Hz + 480Hz)
-        [440, 480].forEach(freq => {
-          const osc = ctx.createOscillator();
-          const gain = ctx.createGain();
-          osc.type = 'sine';
-          osc.frequency.setValueAtTime(freq, now);
-
-          gain.gain.setValueAtTime(0, now);
-          gain.gain.linearRampToValueAtTime(0.08, now + 0.05);
-          gain.gain.setValueAtTime(0.08, now + 1.2);
-          gain.gain.exponentialRampToValueAtTime(0.0001, now + 1.4);
-
-          osc.connect(gain);
-          gain.connect(ctx.destination);
-          osc.start(now);
-          osc.stop(now + 1.5);
-        });
-      }
-
-      ringCycle();
-      ringInterval = setInterval(ringCycle, 3000);
-    }
-
-    function stopRingingAudio() {
-      isRinging = false;
-      clearInterval(ringInterval);
-    }
-
-    // إرسال إشارة طلب مكالمة للطرف الآخر
-    async function initiateCallFrom(role) {
-      playBeepTone(600, 0.1);
-
-      if (role === 'client') {
-        const adminPeerId = `${PEER_PREFIX}admin`;
-        const conn = dataConnections[adminPeerId];
-        if (conn && conn.open) {
-          conn.send({
-            type: 'call-request',
-            fromRole: 'client',
-            callerName: currentClientObj.name,
-            clientCode: currentClientObj.code
-          });
-          document.getElementById('client-call-btn-text').textContent = "جاري الرنين عند التقني...";
-          startRingingAudio();
-        } else {
-          alert("التقني غير متصل حالياً، يمكنك مراسلته عبر الشات.");
-        }
-      } else {
-        const clientCode = activeAdminClientCode;
-        const conn = dataConnections[clientCode];
-        if (conn && conn.open) {
-          conn.send({
-            type: 'call-request',
-            fromRole: 'admin',
-            callerName: 'التقني نورالدين',
-            clientCode: clientCode
-          });
-          document.getElementById('admin-call-btn-text').textContent = "جاري الرنين عند الزبون...";
-          startRingingAudio();
-        } else {
-          alert("الزبون غير متصل حالياً.");
-        }
-      }
-    }
-
-    // استلام إشارة الرنين أو الرد
-    function handleIncomingDataPayload(payload, conn) {
-      // 1. طلب مكالمة واردة -> إطلاق الرنين وفتح النافذة
-      if (payload.type === 'call-request') {
-        pendingCallRequest = payload;
-        startRingingAudio();
-
-        document.getElementById('incoming-caller-title').textContent = `مكالمة واردة من: ${payload.callerName}`;
-        document.getElementById('incoming-caller-subtitle').textContent = "يرغب في بدء مكالمة فيديو وصوت معك";
-        document.getElementById('modal-incoming-call').classList.remove('hidden');
-        return;
-      }
-
-      // 2. الطرف الآخر قبل المكالمة -> فتح الكاميرا والبدء فوراً
-      if (payload.type === 'call-accepted') {
-        stopRingingAudio();
-        if (userRole === 'client') {
-          document.getElementById('client-call-btn-text').textContent = "المكالمة جارية";
-          startActualMediaCall(`${PEER_PREFIX}admin`);
-        } else {
-          document.getElementById('admin-call-btn-text').textContent = "المكالمة جارية";
-          startActualMediaCall(`${PEER_PREFIX}client-${payload.clientCode}`);
-        }
-        return;
-      }
-
-      // 3. الطرف الآخر رفض المكالمة
-      if (payload.type === 'call-rejected') {
-        stopRingingAudio();
-        if (userRole === 'client') {
-          document.getElementById('client-call-btn-text').textContent = "طلب مكالمة فيديو مع التقني";
-        } else {
-          document.getElementById('admin-call-btn-text').textContent = "الاتصال بالزبون";
-        }
-        alert("تم رفض المكالمة من الطرف الآخر.");
-        return;
-      }
-
-      // 4. إنهاء المكالمة
-      if (payload.type === 'call-hungup') {
-        stopRingingAudio();
-        stopMediaStreamTracks();
-        resetCallUI();
-        return;
-      }
-
-      // 5. طرد الزبون
-      if (payload.type === 'session-terminate') {
-        alert("قام المشرف بإنهاء هذه الجلسة وإغلاقها. شكراً لتواصلك.");
-        logoutApp();
-        return;
-      }
-
-      // 6. مسح الشات
-      if (payload.type === 'chat-clear') {
-        if (chatsDatabase[payload.sessionCode]) {
-          chatsDatabase[payload.sessionCode] = [];
-          syncChatsStorage();
-          renderChatDisplay();
-        }
-        return;
-      }
-
-      // 7. إشعار حضور الزبون
-      if (payload.type === 'client-online-ping') {
-        if (userRole === 'admin') {
-          setClientOnline(payload.sessionCode, true);
-        }
-        return;
-      }
-
-      // 8. رسائل الشات العادية (نص، صوت، صور)
-      playToneSequence('msg');
-      const { sessionCode, message } = payload;
-      if (!chatsDatabase[sessionCode]) chatsDatabase[sessionCode] = [];
-      chatsDatabase[sessionCode].push(message);
-      syncChatsStorage();
-      renderChatDisplay();
-    }
-
-    // قبول المكالمة الواردة
-    async function acceptIncomingCall() {
-      stopRingingAudio();
-      document.getElementById('modal-incoming-call').classList.add('hidden');
-
-      const req = pendingCallRequest;
-      if (!req) return;
-
-      const targetConn = (userRole === 'admin') ? dataConnections[req.clientCode] : dataConnections[`${PEER_PREFIX}admin`];
-      if (targetConn && targetConn.open) {
-        targetConn.send({
-          type: 'call-accepted',
-          clientCode: req.clientCode
-        });
-      }
-
-      const targetPeerId = (userRole === 'admin') ? `${PEER_PREFIX}client-${req.clientCode}` : `${PEER_PREFIX}admin`;
-      await startActualMediaCall(targetPeerId);
-    }
-
-    // رفض المكالمة الواردة
-    function rejectIncomingCall() {
-      stopRingingAudio();
-      document.getElementById('modal-incoming-call').classList.add('hidden');
-
-      const req = pendingCallRequest;
-      if (!req) return;
-
-      const targetConn = (userRole === 'admin') ? dataConnections[req.clientCode] : dataConnections[`${PEER_PREFIX}admin`];
-      if (targetConn && targetConn.open) {
-        targetConn.send({
-          type: 'call-rejected',
-          clientCode: req.clientCode
-        });
-      }
-      pendingCallRequest = null;
-    }
-
-    // تشغيل الكاميرا والميكروفون والاتصال الفعلي
-    async function startActualMediaCall(targetPeerId) {
-      try {
-        localCameraStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-        
-        if (userRole === 'admin') {
-          const localV = document.getElementById('admin-local-video');
-          localV.srcObject = localCameraStream;
-          localV.classList.remove('hidden');
-          document.getElementById('admin-call-btn-text').textContent = "إنهاء المكالمة";
-        } else {
-          const localV = document.getElementById('client-local-video');
-          localV.srcObject = localCameraStream;
-          localV.classList.remove('hidden');
-          document.getElementById('client-call-btn-text').textContent = "إنهاء المكالمة";
-        }
-
-        if (myPeer && targetPeerId) {
-          const call = myPeer.call(targetPeerId, localCameraStream);
-          setupMediaCallListener(call);
-        }
-
-      } catch (err) {
-        console.error("Camera error:", err);
-        alert("تعذر تشغيل الكاميرا أو الميكروفون. يرجى منح الإذن في المتصفح.");
-      }
-    }
-
-    function handleIncomingCallSignal(call) {
-      pendingIncomingCallObject = call;
-      const streamToSend = localCameraStream || localScreenStream || createSilentStream();
-      call.answer(streamToSend);
-      setupMediaCallListener(call);
-    }
-
-    function setupMediaCallListener(call) {
-      call.on('stream', (remoteStream) => {
-        playToneSequence('join');
-
-        if (userRole === 'admin') {
-          // هل هو بث الشاشة أم مكالمة فيديو؟
-          const isScreen = remoteStream.getVideoTracks()[0]?.label?.toLowerCase().includes('screen') || false;
-          
-          const phoneV = document.getElementById('admin-phone-stream-video');
-          const phoneHolder = document.getElementById('admin-phone-placeholder');
-          const remoteCallV = document.getElementById('admin-remote-video');
-          const callHolder = document.getElementById('admin-call-placeholder');
-
-          phoneV.srcObject = remoteStream;
-          phoneV.classList.remove('hidden');
-          if (phoneHolder) phoneHolder.classList.add('hidden');
-
-          remoteCallV.srcObject = remoteStream;
-          remoteCallV.classList.remove('hidden');
-          if (callHolder) callHolder.classList.add('hidden');
-
-        } else {
-          const clientRemoteV = document.getElementById('client-remote-video');
-          const placeholder = document.getElementById('client-call-placeholder');
-          clientRemoteV.srcObject = remoteStream;
-          clientRemoteV.classList.remove('hidden');
-          if (placeholder) placeholder.classList.add('hidden');
-        }
-      });
-    }
-
-    function resetCallUI() {
-      if (userRole === 'admin') {
-        document.getElementById('admin-call-btn-text').textContent = "الاتصال بالزبون";
-        document.getElementById('admin-remote-video').classList.add('hidden');
-        document.getElementById('admin-local-video').classList.add('hidden');
-        document.getElementById('admin-call-placeholder').classList.remove('hidden');
-      } else {
-        document.getElementById('client-call-btn-text').textContent = "طلب مكالمة فيديو مع التقني";
-        document.getElementById('client-remote-video').classList.add('hidden');
-        document.getElementById('client-local-video').classList.add('hidden');
-        document.getElementById('client-call-placeholder').classList.remove('hidden');
-      }
-    }
-
-    function stopMediaStreamTracks() {
-      if (localCameraStream) {
-        localCameraStream.getTracks().forEach(t => t.stop());
-        localCameraStream = null;
-      }
-    }
-
-    function createSilentStream() {
-      const canvas = document.createElement('canvas');
-      canvas.width = 2;
-      canvas.height = 2;
-      return canvas.captureStream();
-    }
-
-    /* ================= 4. تسجيل الدخول والتنقل ================= */
-    function handleUniversalLogin(e) {
-      if (e) e.preventDefault();
-      const input = document.getElementById('login-passcode');
-      const alertBox = document.getElementById('login-alert-text');
-      const val = (input.value || '').trim();
-
-      alertBox.classList.add('hidden');
-      if (!val) {
-        alertBox.textContent = "يرجى كتابة الرمز أولاً.";
-        alertBox.classList.remove('hidden');
-        return;
-      }
-
-      // هل هو كود المشرف؟
-      if (val === adminPasscode) {
-        userRole = 'admin';
-        openAdminDashboard();
-        return;
-      }
-
-      // هل هو كود زبون؟
-      let found = clientsDatabase.find(c => c.code.toLowerCase() === val.toLowerCase());
-      if (!found) {
-        const urlClient = extractClientFromUrl();
-        if (urlClient && urlClient.code.toLowerCase() === val.toLowerCase()) {
-          found = urlClient;
-        } else {
-          // إنشاء جلسة زبون فورية بهذا الكود
-          found = {
-            id: Date.now().toString(),
-            name: "زبون محترم",
-            device: "هاتف ذكي",
-            phone: "",
-            code: val.toUpperCase(),
-            created: new Date().toLocaleDateString('ar-MA')
-          };
-        }
-        clientsDatabase.push(found);
-        syncClientsStorage();
-      }
-
-      userRole = 'client';
-      currentClientObj = found;
-      openClientDashboard(found);
-    }
-
-    function openClientDashboard(client) {
-      document.getElementById('client-name-display').textContent = client.name;
-      document.getElementById('client-device-display').textContent = client.device;
-      document.getElementById('client-code-display').textContent = client.code;
-
-      switchView('view-client');
-      renderChatDisplay();
-
-      const clientPeerId = `${PEER_PREFIX}client-${client.code}`;
-      startPeerEngine(clientPeerId, () => {
-        connectClientToAdmin(client.code);
-      });
-
-      window.addEventListener('beforeunload', () => {
-        disconnectClientFromAdmin(client.code);
-      });
-    }
-
-    function connectClientToAdmin(clientCode) {
-      if (!myPeer) return;
-      const adminPeerId = `${PEER_PREFIX}admin`;
-      const conn = myPeer.connect(adminPeerId, {
-        metadata: { clientCode: clientCode }
-      });
-
-      conn.on('open', () => {
-        dataConnections[adminPeerId] = conn;
-        conn.send({
-          type: 'client-online-ping',
-          sessionCode: clientCode
-        });
-      });
-
-      conn.on('data', (data) => {
-        handleIncomingDataPayload(data, conn);
-      });
-    }
-
-    function disconnectClientFromAdmin(clientCode) {
-      const adminPeerId = `${PEER_PREFIX}admin`;
-      const conn = dataConnections[adminPeerId];
-      if (conn && conn.open) {
-        try { conn.close(); } catch(e) {}
-      }
-    }
-
-    function openAdminDashboard() {
-      switchView('view-admin');
-
-      const adminPeerId = `${PEER_PREFIX}admin`;
-      startPeerEngine(adminPeerId, () => {
-        // الأدمن جاهز لاستقبال اتصالات الزبائن
-      });
-
-      if (clientsDatabase.length === 0) {
-        const demo = {
-          id: Date.now().toString(),
-          name: "عبد الإله الصالحي",
-          device: "Samsung Galaxy A54",
-          phone: "0661998877",
-          code: "778899",
-          created: new Date().toLocaleDateString('ar-MA')
-        };
-        clientsDatabase.push(demo);
-        syncClientsStorage();
-      }
-
-      if (!activeAdminClientCode && clientsDatabase.length > 0) {
-        activeAdminClientCode = clientsDatabase[0].code;
-      }
-
-      renderAdminTabs();
-      updateAdminActiveClientDetails();
-      updateAdminActiveClientHeader();
-      renderChatDisplay();
-    }
-
-    function renderAdminTabs() {
-      const container = document.getElementById('admin-clients-tabs');
-      if (!container) return;
-
-      container.innerHTML = clientsDatabase.map(c => {
-        const isSel = c.code === activeAdminClientCode;
-        const isOnline = !!onlineStatusMap[c.code];
-        return `
-          <button 
-            onclick="switchAdminActiveClient('${c.code}')" 
-            class="px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 whitespace-nowrap border ${
-              isSel 
-                ? 'bg-violet-600 text-white border-violet-500 shadow-lg shadow-violet-600/30' 
-                : 'bg-[#050811] text-slate-300 border-[#1f293d] hover:border-slate-600'
-            }"
-          >
-            <span class="w-2.5 h-2.5 rounded-full ${isOnline ? 'bg-emerald-400 pulse-dot' : 'bg-slate-600'}"></span>
-            <span>${c.name}</span>
-            <span class="font-mono text-[10px] px-1.5 py-0.5 rounded bg-black/40 text-amber-300">${c.code}</span>
-          </button>
-        `;
-      }).join('');
-    }
-
-    function switchAdminActiveClient(code) {
-      playBeepTone(450, 0.05);
-      activeAdminClientCode = code;
-      renderAdminTabs();
-      updateAdminActiveClientDetails();
-      updateAdminActiveClientHeader();
-      renderChatDisplay();
-    }
-
-    function updateAdminActiveClientDetails() {
-      const c = clientsDatabase.find(item => item.code === activeAdminClientCode);
-      if (!c) return;
-
-      document.getElementById('admin-stream-title').textContent = `في انتظار شاشة ${c.name}`;
-      document.getElementById('admin-phone-device-text').innerHTML = `<i class="fa-solid fa-mobile-screen-button text-cyan-400 ml-1"></i> الهاتف: <b>${c.device}</b> (${c.name})`;
-      document.getElementById('admin-phone-code-text').textContent = `كود: ${c.code}`;
-      document.getElementById('active-card-code').textContent = c.code;
-      document.getElementById('active-card-phone').textContent = c.phone || 'غير مسجل';
-    }
-
-    function logoutApp() {
-      stopRingingAudio();
-      stopClientScreenShare();
-      stopMediaStreamTracks();
-      
-      if (userRole === 'client' && currentClientObj) {
-        disconnectClientFromAdmin(currentClientObj.code);
-      }
-
-      userRole = null;
-      currentClientObj = null;
-      document.getElementById('login-passcode').value = '';
-      document.getElementById('login-alert-text').classList.add('hidden');
-      switchView('view-login');
-    }
-
-    function switchView(viewId) {
-      ['view-login', 'view-client', 'view-admin'].forEach(id => {
-        const el = document.getElementById(id);
-        if (id === viewId) {
-          el.classList.remove('hidden');
-        } else {
-          el.classList.add('hidden');
-        }
-      });
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    /* ================= 5. مشاركة الشاشة ومحاكاة الهاتف ================= */
-    async function startClientScreenShare() {
-      try {
-        if (!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia) {
-          alert("المتصفح الحالي على الهاتف لا يدعم مشاركة الشاشة المباشرة من الويب.");
-          return;
-        }
-
-        localScreenStream = await navigator.mediaDevices.getDisplayMedia({
-          video: { cursor: "always" },
-          audio: false
-        });
-
-        const previewV = document.getElementById('client-preview-video');
-        const box = document.getElementById('client-preview-box');
-        previewV.srcObject = localScreenStream;
-        box.classList.remove('hidden');
-
-        document.getElementById('client-start-screen-btn').classList.add('hidden');
-        document.getElementById('client-stop-screen-btn').classList.remove('hidden');
-        document.getElementById('client-screen-badge').textContent = "بث مباشر نشط";
-        document.getElementById('client-screen-badge').className = "text-[10px] px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800";
-
-        if (myPeer && currentClientObj) {
-          const adminPeerId = `${PEER_PREFIX}admin`;
-          myPeer.call(adminPeerId, localScreenStream);
-        }
-
-        localScreenStream.getVideoTracks()[0].onended = () => {
-          stopClientScreenShare();
-        };
-
-        playToneSequence('join');
-
-      } catch (err) {
-        console.warn("Screen share declined:", err);
-      }
-    }
-
-    function stopClientScreenShare() {
-      if (localScreenStream) {
-        localScreenStream.getTracks().forEach(t => t.stop());
-        localScreenStream = null;
-      }
-      const previewV = document.getElementById('client-preview-video');
-      if (previewV) previewV.srcObject = null;
-
-      const box = document.getElementById('client-preview-box');
-      if (box) box.classList.add('hidden');
-
-      const startBtn = document.getElementById('client-start-screen-btn');
-      const stopBtn = document.getElementById('client-stop-screen-btn');
-      const badge = document.getElementById('client-screen-badge');
-
-      if (startBtn) startBtn.classList.remove('hidden');
-      if (stopBtn) stopBtn.classList.add('hidden');
-      if (badge) {
-        badge.textContent = "متوقف";
-        badge.className = "text-[10px] px-2 py-0.5 rounded bg-[#131b2e] text-slate-400 border border-[#22304d]";
-      }
-    }
-
-    function runPhoneSimulationDemo() {
-      const canvas = document.createElement('canvas');
-      canvas.width = 720;
-      canvas.height = 1560; // 9:19.5
-      const ctx = canvas.getContext('2d');
-      let frame = 0;
-
-      function draw() {
-        frame++;
-        ctx.fillStyle = "#020617";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        // شريط الحالة العلوي
-        ctx.fillStyle = "#0f172a";
-        ctx.fillRect(0, 0, canvas.width, 80);
-        ctx.fillStyle = "#94a3b8";
-        ctx.font = "bold 26px Tajawal, sans-serif";
-        ctx.textAlign = "right";
-        ctx.fillText("10:45", canvas.width - 50, 52);
-        ctx.textAlign = "left";
-        ctx.fillText("📶 4G  🔋 95%", 50, 52);
-
-        // عنوان الشاشة
-        ctx.textAlign = "center";
-        ctx.fillStyle = "#8b5cf6";
-        ctx.font = "bold 44px Tajawal, sans-serif";
-        ctx.fillText("إعدادات النظام (Paramètres)", canvas.width / 2, 200);
-
-        // خيارات الهاتف
-        const menuItems = [
-          "الاتصالات والشبكات اللاسلكية",
-          "العناية بالبطارية والذاكرة والتخزين",
-          "إدارة التطبيقات والصلاحيات",
-          "حساب Google و الأمان والنسخ الاحتياطي",
-          "تحديث البرامج والنظام"
-        ];
-
-        menuItems.forEach((text, i) => {
-          const y = 300 + i * 140;
-          ctx.fillStyle = i === 1 ? "#1e1b4b" : "#0f172a";
-          ctx.beginPath();
-          ctx.roundRect(40, y, canvas.width - 80, 110, 22);
-          ctx.fill();
-
-          ctx.fillStyle = "#ffffff";
-          ctx.font = "bold 32px Tajawal, sans-serif";
-          ctx.textAlign = "right";
-          ctx.fillText(text, canvas.width - 80, y + 68);
-        });
-
-        // مؤشر توجيه دائري أحمر متحرك يوجه الزبون
-        const targetY = 300 + 1 * 140 + 55;
-        const pointerX = 120 + Math.sin(frame * 0.08) * 20;
-        ctx.beginPath();
-        ctx.arc(pointerX, targetY, 22, 0, Math.PI * 2);
-        ctx.fillStyle = "#ef4444";
-        ctx.fill();
-
-        requestAnimationFrame(draw);
-      }
-      draw();
-
-      const stream = canvas.captureStream(30);
-      const v = document.getElementById('admin-phone-stream-video');
-      const placeholder = document.getElementById('admin-phone-placeholder');
-      if (v) {
-        v.srcObject = stream;
-        v.classList.remove('hidden');
-        if (placeholder) placeholder.classList.add('hidden');
-      }
-      playToneSequence('join');
-    }
-
-    function toggleVideoAspectFill() {
-      const v = document.getElementById('admin-phone-stream-video');
-      if (!v) return;
-      v.classList.toggle('object-cover');
-      v.classList.toggle('object-contain');
-    }
-
-    function togglePhoneFullScreen() {
-      const v = document.getElementById('admin-phone-stream-video');
-      if (!v) return;
-      if (!document.fullscreenElement) {
-        if (v.requestFullscreen) v.requestFullscreen();
-      } else {
-        if (document.exitFullscreen) document.exitFullscreen();
-      }
-    }
-
-    /* ================= 6. الشات المتطور (صوت، صور، كتابة) ================= */
-    let mediaRecorder = null;
-    let recordedAudioChunks = [];
-    let voiceInterval = null;
-    let voiceSeconds = 0;
-
-    function getActiveSessionCode() {
-      if (userRole === 'admin') return activeAdminClientCode;
-      if (userRole === 'client' && currentClientObj) return currentClientObj.code;
-      return null;
-    }
-
-    function sendTextMessage(senderRole) {
-      const code = getActiveSessionCode();
-      if (!code) return;
-
-      const inputId = senderRole === 'admin' ? 'admin-input-msg' : 'client-input-msg';
-      const input = document.getElementById(inputId);
-      const text = (input.value || '').trim();
-      if (!text) return;
-
-      const msg = {
-        id: Date.now().toString(),
-        sender: senderRole,
-        type: 'text',
-        content: text,
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-      };
-
-      commitMessageToDb(code, msg);
-      input.value = '';
-    }
-
-    function sendQuickTipMessage(tip) {
-      const code = getActiveSessionCode();
-      if (!code) return;
-
-      const msg = {
-        id: Date.now().toString(),
-        sender: 'admin',
-        type: 'text',
-        content: tip,
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-      };
-
-      commitMessageToDb(code, msg);
-    }
-
-    function handleImageSend(event, senderRole) {
-      const file = event.target.files[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const base64 = e.target.result;
-        const code = getActiveSessionCode();
-        if (!code) return;
-
-        const msg = {
-          id: Date.now().toString(),
-          sender: senderRole,
-          type: 'image',
-          content: base64,
-          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-        };
-
-        commitMessageToDb(code, msg);
-      };
-      reader.readAsDataURL(file);
-      event.target.value = '';
-    }
-
-    async function startVoiceNote(senderRole) {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        recordedAudioChunks = [];
-        mediaRecorder = new MediaRecorder(stream);
-
-        mediaRecorder.ondataavailable = e => {
-          if (e.data.size > 0) recordedAudioChunks.push(e.data);
-        };
-
-        mediaRecorder.start();
-        voiceSeconds = 0;
-
-        const barId = senderRole === 'admin' ? 'admin-voice-bar' : 'client-voice-bar';
-        const timerId = senderRole === 'admin' ? 'admin-voice-timer' : 'client-voice-timer';
-        document.getElementById(barId).classList.remove('hidden');
-
-        clearInterval(voiceInterval);
-        voiceInterval = setInterval(() => {
-          voiceSeconds++;
-          const m = String(Math.floor(voiceSeconds / 60)).padStart(2, '0');
-          const s = String(voiceSeconds % 60).padStart(2, '0');
-          document.getElementById(timerId).textContent = `${m}:${s}`;
-        }, 1000);
-
-        playBeepTone(500, 0.08);
-
-      } catch (err) {
-        alert("يرجى إعطاء صلاحية الميكروفون لتسجيل الصوت.");
-      }
-    }
-
-    function cancelVoiceNote(senderRole) {
-      if (mediaRecorder && mediaRecorder.state !== 'inactive') {
-        mediaRecorder.stop();
-      }
-      clearInterval(voiceInterval);
-      const barId = senderRole === 'admin' ? 'admin-voice-bar' : 'client-voice-bar';
-      document.getElementById(barId).classList.add('hidden');
-    }
-
-    function stopAndSendVoiceNote(senderRole) {
-      if (!mediaRecorder || mediaRecorder.state === 'inactive') return;
-
-      mediaRecorder.onstop = () => {
-        const audioBlob = new Blob(recordedAudioChunks, { type: 'audio/webm' });
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          const base64Audio = reader.result;
-          const code = getActiveSessionCode();
-          if (!code) return;
-
-          const msg = {
-            id: Date.now().toString(),
-            sender: senderRole,
-            type: 'audio',
-            content: base64Audio,
-            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-          };
-
-          commitMessageToDb(code, msg);
-        };
-        reader.readAsDataURL(audioBlob);
-      };
-
-      mediaRecorder.stop();
-      clearInterval(voiceInterval);
-      const barId = senderRole === 'admin' ? 'admin-voice-bar' : 'client-voice-bar';
-      document.getElementById(barId).classList.add('hidden');
-    }
-
-    function commitMessageToDb(code, messageObj) {
-      if (!chatsDatabase[code]) chatsDatabase[code] = [];
-      chatsDatabase[code].push(messageObj);
-      syncChatsStorage();
-
-      renderChatDisplay();
-      playToneSequence('msg');
-
-      const payload = {
-        type: 'chat',
-        sessionCode: code,
-        message: messageObj
-      };
-
-      if (userRole === 'client') {
-        const adminPeerId = `${PEER_PREFIX}admin`;
-        const conn = dataConnections[adminPeerId];
-        if (conn && conn.open) {
-          try { conn.send(payload); } catch(e) {}
-        }
-      } else {
-        const conn = dataConnections[code];
-        if (conn && conn.open) {
-          try { conn.send(payload); } catch(e) {}
-        }
-      }
-    }
-
-    function renderChatDisplay() {
-      const code = getActiveSessionCode();
-      const messages = (code && chatsDatabase[code]) ? chatsDatabase[code] : [];
-
-      const adminBox = document.getElementById('admin-chat-box');
-      if (adminBox && userRole === 'admin') {
-        adminBox.innerHTML = messages.map(m => formatMsgMarkup(m, 'admin')).join('');
-        adminBox.scrollTop = adminBox.scrollHeight;
-      }
-
-      const clientBox = document.getElementById('client-chat-box');
-      if (clientBox && userRole === 'client') {
-        clientBox.innerHTML = messages.map(m => formatMsgMarkup(m, 'client')).join('');
-        clientBox.scrollTop = clientBox.scrollHeight;
-      }
-    }
-
-    function formatMsgMarkup(m, viewer) {
-      const isMine = m.sender === viewer;
-      const isAdmin = m.sender === 'admin';
-
-      let body = '';
-      if (m.type === 'text') {
-        body = `<p class="leading-relaxed font-normal">${m.content}</p>`;
-      } else if (m.type === 'image') {
-        body = `
-          <div class="mt-1 cursor-pointer" onclick="openLightbox('${m.content}')">
-            <img src="${m.content}" class="max-w-[200px] max-h-[160px] rounded-xl object-cover border border-white/20 shadow-md">
-          </div>
-        `;
-      } else if (m.type === 'audio') {
-        body = `
-          <div class="mt-1 flex items-center gap-2">
-            <audio controls src="${m.content}" class="h-8 max-w-[210px] rounded-lg"></audio>
-          </div>
-        `;
-      }
-
-      return `
-        <div class="flex flex-col ${isMine ? 'items-start' : 'items-end'}">
-          <div class="max-w-[85%] rounded-2xl px-3.5 py-2.5 ${
-            isAdmin 
-              ? 'bg-gradient-to-r from-violet-600 to-indigo-600 text-white rounded-br-none shadow-md shadow-violet-600/20' 
-              : 'bg-[#151f33] text-slate-100 border border-[#22304d] rounded-bl-none shadow'
-          }">
-            <div class="flex items-center gap-2 mb-1 text-[10px] ${isAdmin ? 'text-violet-200' : 'text-slate-400'}">
-              <strong>${isAdmin ? 'التقني نورالدين' : 'الزبون'}</strong>
-              <span>${m.time || ''}</span>
+    <!-- نافذة منبثقة عند استقبال مكالمة (Ringing) -->
+    <div id="incomingCallModal" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-cyan-500/40 rounded-3xl p-6 text-center max-w-xs w-full shadow-2xl animate-pulse">
+            <div class="w-16 h-16 bg-cyan-500/20 text-cyan-400 rounded-full flex items-center justify-center text-2xl mx-auto mb-3">
+                <i class="fa-solid fa-phone-volume animate-bounce"></i>
             </div>
-            ${body}
-          </div>
+            <h4 class="font-bold text-white text-base">مكالمة واردة...</h4>
+            <p id="callerNameText" class="text-xs text-slate-400 mt-1 mb-5">طلب اتصال مباشر</p>
+            <div class="flex gap-3 justify-center">
+                <button onclick="acceptCall()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition flex-1">
+                    قبول
+                </button>
+                <button onclick="rejectCall()" class="bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition flex-1">
+                    رفض
+                </button>
+            </div>
         </div>
-      `;
-    }
+    </div>
 
-    function openLightbox(src) {
-      document.getElementById('lightbox-img').src = src;
-      document.getElementById('modal-lightbox').classList.remove('hidden');
-    }
+    <!-- تذييل الصفحة -->
+    <footer class="bg-slate-950 border-t border-slate-900 py-3 text-center text-xs text-slate-600">
+        إلكترو نورالدين - صيانة وبرمجة الهواتف الذكية © 2026
+    </footer>
 
-    function closeLightbox() {
-      document.getElementById('modal-lightbox').classList.add('hidden');
-    }
+    <!-- المنطق البرمجي (JavaScript) -->
+    <script>
+        const ADMIN_CODE = "1234";
+        let currentUser = null; // { role: 'admin' | 'client', code: '', data: {} }
+        let clients = JSON.parse(localStorage.getItem('nds_clients') || '[]');
+        let activeClient = null;
+        let peer = null;
+        let activeConnection = null;
+        let activeCall = null;
+        let localStream = null;
 
-    /* ================= 7. صلاحيات تحكم الأدمن ================= */
-    function clearActiveChatOnly() {
-      if (!activeAdminClientCode) return;
-      if (!confirm("هل تريد مسح جميع رسائل المحادثة لهذا الزبون؟")) return;
-
-      chatsDatabase[activeAdminClientCode] = [];
-      syncChatsStorage();
-      renderChatDisplay();
-
-      const conn = dataConnections[activeAdminClientCode];
-      if (conn && conn.open) {
-        conn.send({
-          type: 'chat-clear',
-          sessionCode: activeAdminClientCode
+        // تهيئة النظام عند الفتح
+        window.addEventListener('DOMContentLoaded', () => {
+            // التحقق من وجود كود في رابط الموقع (مثل: ?code=123)
+            const urlParams = new URLSearchParams(window.location.search);
+            const codeParam = urlParams.get('code');
+            if (codeParam) {
+                document.getElementById('accessCodeInput').value = codeParam;
+                handleLogin();
+            }
         });
-      }
-      playBeepTone(700, 0.08);
-    }
 
-    function terminateActiveClient() {
-      if (!activeAdminClientCode) return;
-      if (!confirm("هل تريد إغلاق الجلسة فوراً وطرد الزبون عن بُعد؟")) return;
-
-      const conn = dataConnections[activeAdminClientCode];
-      if (conn && conn.open) {
-        conn.send({
-          type: 'session-terminate',
-          sessionCode: activeAdminClientCode
-        });
-        setTimeout(() => conn.close(), 200);
-      }
-
-      setClientOnline(activeAdminClientCode, false);
-      alert("تم طرد الزبون وإنهاء جلسته بنجاح.");
-    }
-
-    function deleteActiveClientRecord() {
-      if (!confirm("هل أنت متأكد من حذف الزبون وسجله نهائياً؟")) return;
-
-      const conn = dataConnections[activeAdminClientCode];
-      if (conn && conn.open) {
-        try {
-          conn.send({ type: 'session-terminate', sessionCode: activeAdminClientCode });
-          conn.close();
-        } catch(e) {}
-      }
-
-      const index = clientsDatabase.findIndex(c => c.code === activeAdminClientCode);
-      if (index !== -1) {
-        delete chatsDatabase[activeAdminClientCode];
-        delete onlineStatusMap[activeAdminClientCode];
-        delete dataConnections[activeAdminClientCode];
-        syncChatsStorage();
-
-        clientsDatabase.splice(index, 1);
-        syncClientsStorage();
-
-        activeAdminClientCode = clientsDatabase.length > 0 ? clientsDatabase[0].code : null;
-        renderAdminTabs();
-        updateAdminActiveClientDetails();
-        updateAdminActiveClientHeader();
-        renderChatDisplay();
-      }
-    }
-
-    function copyClientInviteLink() {
-      const c = clientsDatabase.find(i => i.code === activeAdminClientCode);
-      if (!c) return;
-
-      const baseUrl = window.location.origin + window.location.pathname;
-      const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(c))));
-      const directUrl = `${baseUrl}#session=${encoded}`;
-
-      const text = `السلام عليكم ${c.name}، معك الدعم الفني لإلكترو نورالدين.\nتفضل بالضغط على هذا الرابط للدخول المباشر إلى المنصة والبدء فوراً:\n${directUrl}\n\n(أو كود دخولك اليدوي هو: ${c.code})`;
-
-      const temp = document.createElement("textarea");
-      temp.value = text;
-      document.body.appendChild(temp);
-      temp.select();
-      document.execCommand('copy');
-      document.body.removeChild(temp);
-
-      playBeepTone(650, 0.1);
-      alert("تم نسخ رابط واتساب المباشر بنجاح!");
-    }
-
-    function extractClientFromUrl() {
-      try {
-        const hash = window.location.hash;
-        if (hash.startsWith('#session=')) {
-          const raw = hash.replace('#session=', '');
-          const decoded = decodeURIComponent(escape(atob(raw)));
-          return JSON.parse(decoded);
+        function fillAdminCode() {
+            document.getElementById('accessCodeInput').value = ADMIN_CODE;
+            handleLogin();
         }
-      } catch(e) {
-        console.warn("URL Hash parse error:", e);
-      }
-      return null;
-    }
 
-    function openNewClientModal() {
-      generateRandomClientCode();
-      document.getElementById('modal-client-name').value = '';
-      document.getElementById('modal-client-device').value = '';
-      document.getElementById('modal-client-phone').value = '';
-      document.getElementById('modal-new-client').classList.remove('hidden');
-    }
+        function handleLogin() {
+            const inputCode = document.getElementById('accessCodeInput').value.trim();
+            const errBox = document.getElementById('loginError');
+            errBox.classList.add('hidden');
 
-    function closeNewClientModal() {
-      document.getElementById('modal-new-client').classList.add('hidden');
-    }
+            if (!inputCode) {
+                errBox.innerText = "يرجى كتابة كود الجلسة أو كود الأدمن أولاً";
+                errBox.classList.remove('hidden');
+                return;
+            }
 
-    function generateRandomClientCode() {
-      const code = Math.floor(100000 + Math.random() * 900000).toString();
-      document.getElementById('modal-client-code').value = code;
-    }
+            // 1. الدخول كأدمن
+            if (inputCode === ADMIN_CODE) {
+                currentUser = { role: 'admin', code: ADMIN_CODE };
+                showAdminScreen();
+                initPeer('nds-admin-host');
+                return;
+            }
 
-    function saveNewClientRecord() {
-      const name = document.getElementById('modal-client-name').value.trim() || 'زبون جديد';
-      const device = document.getElementById('modal-client-device').value.trim() || 'هاتف ذكي';
-      const phone = document.getElementById('modal-client-phone').value.trim();
-      const code = document.getElementById('modal-client-code').value.trim().toUpperCase();
+            // 2. الدخول كزبون
+            const foundClient = clients.find(c => c.code === inputCode);
+            if (foundClient) {
+                currentUser = { role: 'client', code: inputCode, data: foundClient };
+                showClientScreen(foundClient);
+                initPeer('nds-client-' + inputCode);
+                return;
+            }
 
-      if (!code) {
-        alert("يرجى تحديد كود الجلسة");
-        return;
-      }
-
-      const newRecord = {
-        id: Date.now().toString(),
-        name,
-        device,
-        phone,
-        code,
-        created: new Date().toLocaleDateString('ar-MA')
-      };
-
-      clientsDatabase.unshift(newRecord);
-      syncClientsStorage();
-
-      activeAdminClientCode = code;
-      renderAdminTabs();
-      updateAdminActiveClientDetails();
-      updateAdminActiveClientHeader();
-      closeNewClientModal();
-      playBeepTone(750, 0.1);
-    }
-
-    function editCurrentClientDetails() {
-      const c = clientsDatabase.find(i => i.code === activeAdminClientCode);
-      if (!c) return;
-
-      const newName = prompt("تعديل اسم الزبون:", c.name);
-      if (newName !== null && newName.trim() !== "") c.name = newName.trim();
-
-      const newDevice = prompt("تعديل نوع الهاتف:", c.device);
-      if (newDevice !== null) c.device = newDevice.trim();
-
-      const newCode = prompt("تعديل كود الجلسة:", c.code);
-      if (newCode !== null && newCode.trim() !== "") {
-        if (chatsDatabase[c.code]) {
-          chatsDatabase[newCode.trim().toUpperCase()] = chatsDatabase[c.code];
-          delete chatsDatabase[c.code];
-          syncChatsStorage();
+            // كود غير مسجل
+            errBox.innerText = "كود الجلسة غير صحيح أو غير مسجل في لوحة المدير!";
+            errBox.classList.remove('hidden');
         }
-        c.code = newCode.trim().toUpperCase();
-        activeAdminClientCode = c.code;
-      }
 
-      syncClientsStorage();
-      renderAdminTabs();
-      updateAdminActiveClientDetails();
-      renderChatDisplay();
-    }
-
-    function openAdminSecurityModal() {
-      document.getElementById('admin-key-input').value = adminPasscode;
-      document.getElementById('modal-admin-key').classList.remove('hidden');
-    }
-
-    function closeAdminSecurityModal() {
-      document.getElementById('modal-admin-key').classList.add('hidden');
-    }
-
-    function saveAdminNewKey() {
-      const val = document.getElementById('admin-key-input').value.trim();
-      if (!val) {
-        alert("يرجى كتابة رمز صحيح");
-        return;
-      }
-      adminPasscode = val;
-      localStorage.setItem(KEY_ADMIN_PASS, val);
-      closeAdminSecurityModal();
-      playBeepTone(750, 0.1);
-      alert("تم تغيير رمز المشرف بنجاح!");
-    }
-
-    /* ================= 8. باقة الموسيقى الخلفية (إسلامية، غربية، شرقية) والمؤثرات ================= */
-    let audioContext = null;
-    let sfxOn = true;
-    let musicOn = false;
-    let currentMusicTimer = null;
-
-    function getAudioContext() {
-      if (!audioContext) {
-        audioContext = new (window.AudioContext || window.webkitAudioContext)();
-      }
-      if (audioContext.state === 'suspended') {
-        audioContext.resume();
-      }
-      return audioContext;
-    }
-
-    // توليد نغمة وترية مهدئة أو بيانو ناعم
-    function playMelodicTone(freq, timeOffset = 0, duration = 1.6, waveType = 'sine', gainLevel = 0.04) {
-      if (!sfxOn && !musicOn) return;
-      const ctx = getAudioContext();
-      const startTime = ctx.currentTime + timeOffset;
-
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-
-      osc.type = waveType;
-      osc.frequency.setValueAtTime(freq, startTime);
-
-      gain.gain.setValueAtTime(0.0001, startTime);
-      gain.gain.linearRampToValueAtTime(gainLevel, startTime + 0.04);
-      gain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
-
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-
-      osc.start(startTime);
-      osc.stop(startTime + duration);
-    }
-
-    // باقات المقطوعات الموسيقية الصامتة
-    const musicRepertoire = {
-      // 1. مقطوعة روحانية إسلامية صامتة (ناي وعود وتأمل دافئ بمقام حجاز/صبا)
-      islamic: [
-        [293.66, 311.13, 369.99, 392.00, 440.00, 369.99, 311.13, 293.66],
-        [220.00, 293.66, 369.99, 440.00, 493.88, 440.00, 369.99, 293.66],
-        [369.99, 440.00, 523.25, 587.33, 523.25, 440.00, 369.99, 293.66],
-        [146.83, 220.00, 293.66, 369.99, 293.66, 220.00, 146.83]
-      ],
-      // 2. ألحان غربية هادئة صامتة (Lo-Fi Piano & Ambient Chill)
-      western: [
-        [261.63, 329.63, 392.00, 523.25, 493.88, 392.00, 329.63], // C E G C B G E
-        [220.00, 261.63, 329.63, 440.00, 392.00, 329.63, 261.63], // Am chord
-        [174.61, 220.00, 261.63, 349.23, 329.63, 261.63, 220.00], // F chord
-        [196.00, 246.94, 293.66, 392.00, 349.23, 293.66, 196.00]  // G chord
-      ],
-      // 3. تقاسيم قانون وعود شرقية (نهاوند وبياتي دافئ)
-      oriental: [
-        [293.66, 329.63, 349.23, 392.00, 440.00, 392.00, 349.23, 329.63],
-        [293.66, 349.23, 440.00, 523.25, 493.88, 440.00, 392.00, 349.23],
-        [392.00, 440.00, 523.25, 587.33, 523.25, 440.00, 349.23, 293.66],
-        [220.00, 293.66, 349.23, 440.00, 392.00, 329.63, 293.66]
-      ]
-    };
-
-    let currentPhraseIdx = 0;
-
-    function playActiveMusicCycle() {
-      if (!musicOn) return;
-      const genre = document.getElementById('music-genre-select').value;
-      const phrases = musicRepertoire[genre] || musicRepertoire.islamic;
-      const phrase = phrases[currentPhraseIdx];
-      currentPhraseIdx = (currentPhraseIdx + 1) % phrases.length;
-
-      const wave = (genre === 'western') ? 'sine' : 'triangle';
-      const tempo = (genre === 'western') ? 0.45 : 0.38;
-
-      phrase.forEach((freq, idx) => {
-        playMelodicTone(freq, idx * tempo, 1.4, wave, 0.035);
-        if (idx % 2 === 0) {
-          // وتر قرار Bass دافئ
-          playMelodicTone(freq / 2, idx * tempo, 1.8, 'sine', 0.025);
+        function showAdminScreen() {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('clientScreen').classList.add('hidden');
+            document.getElementById('adminScreen').classList.remove('hidden');
+            document.getElementById('logoutBtn').classList.remove('hidden');
+            renderClientsList();
         }
-      });
-    }
 
-    function toggleBackgroundMusic() {
-      const btnText = document.getElementById('music-btn-text');
-      const btnIcon = document.getElementById('music-btn-icon');
+        function showClientScreen(clientData) {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('adminScreen').classList.add('hidden');
+            document.getElementById('clientScreen').classList.remove('hidden');
+            document.getElementById('logoutBtn').classList.remove('hidden');
 
-      if (musicOn) {
-        musicOn = false;
-        clearInterval(currentMusicTimer);
-        btnText.textContent = "تشغيل";
-        btnIcon.className = "fa-solid fa-play text-[10px]";
-      } else {
-        musicOn = true;
-        btnText.textContent = "إيقاف";
-        btnIcon.className = "fa-solid fa-pause text-[10px] text-amber-400";
-        playActiveMusicCycle();
-        currentMusicTimer = setInterval(playActiveMusicCycle, 3800);
-      }
-    }
+            document.getElementById('clientPortalName').innerText = "مرحباً بك: " + clientData.name;
+            document.getElementById('clientPortalDevice').innerText = "الجهاز: " + (clientData.device || 'غير محدد');
+        }
 
-    function changeMusicGenre() {
-      if (musicOn) {
-        clearInterval(currentMusicTimer);
-        currentPhraseIdx = 0;
-        playActiveMusicCycle();
-        currentMusicTimer = setInterval(playActiveMusicCycle, 3800);
-      }
-    }
+        function logout() {
+            if (peer) peer.destroy();
+            window.location.href = window.location.pathname;
+        }
 
-    function playToneSequence(type) {
-      if (!sfxOn) return;
-      if (type === 'join') {
-        playMelodicTone(523.25, 0, 0.3, 'sine', 0.05);
-        playMelodicTone(659.25, 0.1, 0.4, 'sine', 0.05);
-        playMelodicTone(783.99, 0.2, 0.6, 'sine', 0.06);
-      } else if (type === 'leave') {
-        playMelodicTone(400, 0, 0.2, 'sine', 0.05);
-        playMelodicTone(300, 0.12, 0.35, 'sine', 0.05);
-      } else if (type === 'msg') {
-        playMelodicTone(587.33, 0, 0.25, 'sine', 0.05);
-        playMelodicTone(880, 0.08, 0.4, 'sine', 0.06);
-      }
-    }
+        // توليد جلسة زبون جديدة من لوحة الأدمن
+        function createNewClientSession() {
+            const name = document.getElementById('newClientName').value.trim();
+            const device = document.getElementById('newClientDevice').value.trim();
+            const phone = document.getElementById('newClientPhone').value.trim();
 
-    function playBeepTone(freq = 440, duration = 0.1) {
-      if (!sfxOn) return;
-      try {
-        const ctx = getAudioContext();
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
+            if (!name) {
+                alert("يرجى كتابة اسم الزبون");
+                return;
+            }
 
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(freq, ctx.currentTime);
+            // توليد كود عشوائي من 4 أرقام
+            const code = Math.floor(1000 + Math.random() * 9000).toString();
+            const newClient = {
+                id: Date.now().toString(),
+                code: code,
+                name: name,
+                device: device,
+                phone: phone,
+                created: new Date().toLocaleTimeString('ar-MA')
+            };
 
-        gain.gain.setValueAtTime(0.06, ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration);
+            clients.push(newClient);
+            localStorage.setItem('nds_clients', JSON.stringify(clients));
 
-        osc.connect(gain);
-        gain.connect(ctx.destination);
+            document.getElementById('newClientName').value = '';
+            document.getElementById('newClientDevice').value = '';
+            document.getElementById('newClientPhone').value = '';
 
-        osc.start();
-        osc.stop(ctx.currentTime + duration);
-      } catch (e) {}
-    }
+            renderClientsList();
+            selectClient(newClient.id);
 
-    function toggleSfx() {
-      sfxOn = !sfxOn;
-      const icon = document.getElementById('sfx-icon');
-      if (sfxOn) {
-        icon.className = "fa-solid fa-volume-high text-cyan-400";
-        playBeepTone(520, 0.1);
-      } else {
-        icon.className = "fa-solid fa-volume-xmark text-slate-500";
-      }
-    }
+            // رابط مباشر للزبون
+            const shareUrl = `${window.location.origin}${window.location.pathname}?code=${code}`;
+            const msg = `مرحباً بك ${name}، هذا هو رابط الدخول لجلسة الصيانة المباشرة لدى إلكترو نورالدين: ${shareUrl}`;
+            
+            if (phone) {
+                window.open(`https://wa.me/212${phone.replace(/^0/, '')}?text=${encodeURIComponent(msg)}`, '_blank');
+            } else {
+                navigator.clipboard.writeText(shareUrl);
+                alert(`تم إنشاء الجلسة بنجاح!\nالكود: ${code}\nتم نسخ الرابط في الحافظة لمشاركته مع الزبون.`);
+            }
+        }
 
-    /* ================= 9. الإقلاع الأولي ================= */
-    window.onload = function() {
-      const sessionData = extractClientFromUrl();
-      if (sessionData && sessionData.code) {
-        document.getElementById('login-passcode').value = sessionData.code;
-        handleUniversalLogin();
-        return;
-      }
+        function renderClientsList() {
+            const listContainer = document.getElementById('clientsList');
+            document.getElementById('clientsCount').innerText = clients.length;
+            listContainer.innerHTML = '';
 
-      const params = new URLSearchParams(window.location.search);
-      const qCode = params.get('code');
-      if (qCode) {
-        document.getElementById('login-passcode').value = qCode;
-        handleUniversalLogin();
-      }
-    };
-  </script>
+            if (clients.length === 0) {
+                listContainer.innerHTML = '<p class="text-xs text-slate-500 text-center py-4">لا توجد جلسات مفتوحة حالياً</p>';
+                return;
+            }
+
+            clients.forEach(c => {
+                const isSelected = activeClient && activeClient.id === c.id;
+                const div = document.createElement('div');
+                div.className = `p-3 rounded-xl border transition cursor-pointer flex items-center justify-between ${isSelected ? 'bg-cyan-950/40 border-cyan-500/50' : 'bg-slate-950 border-slate-800 hover:border-slate-700'}`;
+                div.onclick = () => selectClient(c.id);
+
+                div.innerHTML = `
+                    <div class="overflow-hidden">
+                        <div class="font-bold text-xs text-slate-200 truncate">${c.name}</div>
+                        <div class="text-[11px] text-slate-400 truncate">${c.device || 'هاتف'} | كود: <span class="font-mono text-cyan-400">${c.code}</span></div>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <button onclick="event.stopPropagation(); removeClient('${c.id}')" class="text-slate-600 hover:text-rose-400 p-1 text-xs">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+                `;
+                listContainer.appendChild(div);
+            });
+        }
+
+        function selectClient(id) {
+            activeClient = clients.find(c => c.id === id);
+            if (!activeClient) return;
+
+            document.getElementById('activeClientTitle').innerText = activeClient.name;
+            document.getElementById('activeClientSubtitle').innerText = `الجهاز: ${activeClient.device || 'غير محدد'} | الكود: ${activeClient.code}`;
+
+            renderClientsList();
+            connectToPeer('nds-client-' + activeClient.code);
+        }
+
+        function removeClient(id) {
+            clients = clients.filter(c => c.id !== id);
+            localStorage.setItem('nds_clients', JSON.stringify(clients));
+            if (activeClient && activeClient.id === id) {
+                activeClient = null;
+                document.getElementById('activeClientTitle').innerText = "اختر جلسة للمتابعة";
+                document.getElementById('activeClientSubtitle').innerText = "لم يتم اختيار أي زبون حتى الآن";
+            }
+            renderClientsList();
+        }
+
+        // تهيئة اتصال WebRTC عبر PeerJS مع خوادم Google STUN
+        function initPeer(peerId) {
+            peer = new Peer(peerId, {
+                config: {
+                    iceServers: [
+                        { urls: 'stun:stun.l.google.com:19302' },
+                        { urls: 'stun:stun1.l.google.com:19302' },
+                        { urls: 'stun:stun2.l.google.com:19302' }
+                    ]
+                }
+            });
+
+            peer.on('open', (id) => {
+                document.getElementById('connectionStatusBadge').classList.remove('hidden');
+            });
+
+            // استقبال رسائل البيانات
+            peer.on('connection', (conn) => {
+                activeConnection = conn;
+                setupConnectionHandlers(conn);
+            });
+
+            // استقبال المكالمات أو الشاشة
+            peer.on('call', (call) => {
+                document.getElementById('callerNameText').innerText = "اتصال وارد من الطرف الآخر";
+                document.getElementById('incomingCallModal').classList.remove('hidden');
+                window.pendingCall = call;
+            });
+        }
+
+        function connectToPeer(remotePeerId) {
+            if (!peer) return;
+            const conn = peer.connect(remotePeerId);
+            activeConnection = conn;
+            setupConnectionHandlers(conn);
+        }
+
+        function setupConnectionHandlers(conn) {
+            conn.on('data', (data) => {
+                if (data.type === 'chat') {
+                    appendMessage(data.sender, data.text);
+                }
+            });
+        }
+
+        // إرسال الرسائل
+        function sendAdminMessage() {
+            const input = document.getElementById('adminMsgInput');
+            const text = input.value.trim();
+            if (!text) return;
+
+            appendMessage('أنا (الأدمن)', text);
+            if (activeConnection && activeConnection.open) {
+                activeConnection.send({ type: 'chat', sender: 'التقني', text: text });
+            }
+            input.value = '';
+        }
+
+        function sendClientMessage() {
+            const input = document.getElementById('clientMsgInput');
+            const text = input.value.trim();
+            if (!text) return;
+
+            appendMessage('أنا', text);
+            if (activeConnection && activeConnection.open) {
+                activeConnection.send({ type: 'chat', sender: currentUser.data.name, text: text });
+            } else if (peer) {
+                // محاولة الإرسال للأدمن مباشرة
+                const conn = peer.connect('nds-admin-host');
+                conn.on('open', () => {
+                    conn.send({ type: 'chat', sender: currentUser.data.name, text: text });
+                });
+            }
+            input.value = '';
+        }
+
+        function appendMessage(sender, text) {
+            const isAdmin = currentUser && currentUser.role === 'admin';
+            const chatBox = isAdmin ? document.getElementById('adminChatMessages') : document.getElementById('clientChatMessages');
+            
+            const msgDiv = document.createElement('div');
+            msgDiv.className = "bg-slate-800/80 border border-slate-700/60 p-2.5 rounded-xl";
+            msgDiv.innerHTML = `<span class="font-bold text-cyan-400 block mb-0.5 text-[11px]">${sender}</span><p class="text-slate-200">${text}</p>`;
+            chatBox.appendChild(msgDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function clearCurrentChat() {
+            document.getElementById('adminChatMessages').innerHTML = '<div class="text-center text-slate-600 my-4 text-[11px]">تم مسح المحادثة</div>';
+        }
+
+        // مشاركة الشاشة من هاتف الزبون
+        async function toggleScreenShare() {
+            try {
+                const stream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+                const call = peer.call('nds-admin-host', stream);
+                document.getElementById('shareBtnText').innerText = "الشاشة قيد المشاركة الآن";
+                document.getElementById('startShareBtn').classList.replace('from-cyan-600', 'from-emerald-600');
+
+                stream.getVideoTracks()[0].onended = () => {
+                    document.getElementById('shareBtnText').innerText = "بدء مشاركة شاشة هاتفي";
+                    document.getElementById('startShareBtn').classList.replace('from-emerald-600', 'from-cyan-600');
+                };
+            } catch (err) {
+                alert("لم يتم تفعيل مشاركة الشاشة: " + err.message);
+            }
+        }
+
+        // المكالمات
+        function acceptCall() {
+            document.getElementById('incomingCallModal').classList.add('hidden');
+            if (window.pendingCall) {
+                navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then((stream) => {
+                    localStream = stream;
+                    document.getElementById('localVideo').srcObject = stream;
+                    window.pendingCall.answer(stream);
+                    window.pendingCall.on('stream', (remoteStream) => {
+                        // التحقق إذا كان بث شاشة أم مكالمة فيديو
+                        const isScreen = remoteStream.getVideoTracks()[0].getSettings().displaySurface !== undefined;
+                        if (isScreen && currentUser.role === 'admin') {
+                            const screenVid = document.getElementById('clientScreenVideo');
+                            screenVid.srcObject = remoteStream;
+                            screenVid.classList.remove('hidden');
+                            document.getElementById('noStreamPlaceholder').classList.add('hidden');
+                        } else {
+                            document.getElementById('remoteVideo').srcObject = remoteStream;
+                            document.getElementById('videoModal').classList.remove('hidden');
+                        }
+                    });
+                });
+            }
+        }
+
+        function rejectCall() {
+            document.getElementById('incomingCallModal').classList.add('hidden');
+            if (window.pendingCall) {
+                window.pendingCall.close();
+            }
+        }
+
+        function closeVideoModal() {
+            document.getElementById('videoModal').classList.add('hidden');
+            if (localStream) {
+                localStream.getTracks().forEach(track => track.stop());
+            }
+        }
+    </script>
 </body>
 </html>
-```
